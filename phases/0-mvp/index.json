@@ -47,7 +47,7 @@
       "name": "app-state",
       "status": "completed",
       "started_at": "2026-11-03T06:53:33+0900",
-      "completed_at": "2026-11-03T06:58:30+0900",
+      "completed_at": "2026-11-03T06:58:21+0900",
       "summary": "src/lib/state/(presets.ts 프리셋·기본 설정·matchPreset, inputs.ts parseMinutes·parseMultiplier, draft-reducer.ts 목차·설정·직접 조정 불변 업데이트(잘못된 값은 같은 객체), app-reducer.ts 메뉴·단계·추출·중복 강의·계획하기/수정(깊은 복사)/삭제·plansRevision) + src/lib/storage/plans.ts(currculator:plans:v1 {version:1,plans} 저장, 계획별 검증·새 객체 재구성, 예외 미전파) + 테스트 151개"
     },
     {
