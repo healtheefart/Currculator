@@ -69,7 +69,10 @@
     {
       "step": 8,
       "name": "plan-views",
-      "status": "pending"
+      "status": "error",
+      "started_at": "2026-11-03T07:08:10+0900",
+      "error_message": "[3회 시도 후 실패] Step did not update status",
+      "failed_at": "2026-11-03T07:08:22+0900"
     },
     {
       "step": 9,
