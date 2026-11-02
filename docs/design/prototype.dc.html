@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/radii.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/tokens/base.css">
+  <link rel="stylesheet" href="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/styles.css">
+  <script src="_ds/currculator-design-system-3f22075c-9367-4cde-81f9-edf809834618/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700&amp;display=swap">
+  <style>:root{--font-display:"Noto Sans KR",sans-serif;--font-text:"Noto Sans KR",sans-serif}body,input,button{font-family:"Noto Sans KR",sans-serif}body{margin:0;background:#f5f5f7}a{color:#0066cc}a:hover{text-decoration:underline}input:focus-visible,button:focus-visible{outline:2px solid #0071e3;outline-offset:2px}
+  .cc-gnav-links{display:flex!important;justify-content:flex-start!important;gap:28px!important}.cc-gnav-burger{display:none!important}.cc-gnav-links a{font-size:14px!important;opacity:.6!important}.cc-gnav-links a[style*="opacity: 1;"]{opacity:1!important;font-weight:600}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--surface-parchment);color:var(--text-primary);font:var(--type-body);letter-spacing:var(--tracking-body);padding-bottom:96px">
+  <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.GlobalNav" brand="Currculator" links="{{ navLinks }}" active="{{ navActive }}" on-navigate="{{ onNavigate }}" on-brand="{{ onBrand }}" hint-size="100%,44px"></x-import>
+
+  <sc-if value="{{ showStepBar }}" hint-placeholder-val="{{ false }}">
+    <div style="background:var(--surface-frosted);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--color-hairline-alpha);position:sticky;top:0;z-index:5">
+      <div style="max-width:980px;margin:0 auto;padding:0 20px;min-height:52px;display:flex;align-items:center;gap:20px;overflow-x:auto">
+        <sc-if value="{{ editing }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font:var(--type-fine-print);background:var(--surface-chip-gray);border-radius:980px;padding:5px 10px">계획 수정 중</span></sc-if>
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+          <button onClick="{{ s.go }}" style="all:unset;cursor:pointer;flex:none;display:flex;align-items:center;gap:8px;font:var(--type-caption);letter-spacing:var(--tracking-caption);color:{{ s.color }};font-weight:{{ s.weight }}">
+            <span style="width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:var(--type-fine-print);background:{{ s.dotBg }};color:{{ s.dotFg }}">{{ s.num }}</span>{{ s.label }}
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isTypeStep }}" hint-placeholder-val="{{ true }}">
+    <div style="max-width:980px;margin:0 auto;padding:clamp(56px,10vw,112px) 20px 80px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+      <h1 style="margin:0;font:var(--type-hero-display);font-size:clamp(34px,6vw,56px);letter-spacing:var(--tracking-hero-display);text-wrap:balance">무엇으로 공부하나요?</h1>
+      <p style="margin:0;font:var(--type-lead-airy);font-size:clamp(19px,2.4vw,24px);color:var(--text-secondary);max-width:600px;text-wrap:pretty">목차를 가져올 학습 자료를 고르세요.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;width:100%;max-width:640px;margin-top:16px">
+        <sc-for list="{{ sourceOpts }}" as="o" hint-placeholder-count="2">
+          <button onClick="{{ o.pick }}" class="cc-press" style="all:unset;cursor:pointer;box-sizing:border-box;text-align:left;background:var(--surface-canvas);border:{{ o.border }};border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:10px;min-height:168px">
+            <sc-if value="{{ o.isCourse }}" hint-placeholder-val="{{ false }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/monitor-play.svg" alt="" width="24" height="24"></sc-if>
+            <sc-if value="{{ o.soon }}" hint-placeholder-val="{{ false }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/book-open.svg" alt="" width="24" height="24"></sc-if>
+            <span style="font:var(--type-tagline);margin-top:auto">{{ o.title }}</span>
+            <span style="font:var(--type-caption);color:var(--text-secondary)">{{ o.desc }}</span>
+            <sc-if value="{{ o.soon }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;font:var(--type-fine-print);background:var(--surface-chip-gray);border-radius:980px;padding:4px 10px">준비 중</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+      <sc-if value="{{ bookNotice }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:0;font:var(--type-caption);max-width:640px">책 목차로 계획 짜기는 준비 중이에요. 지금은 강의 커리큘럼만 지원해요.</p>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isUrlStep }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:980px;margin:0 auto;padding:clamp(48px,8vw,96px) 20px 80px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+      <sc-if value="{{ notExtracting }}" hint-placeholder-val="{{ true }}">
+        <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.TextLink" on-click="{{ backToType }}" hint-size="140px,20px">학습 자료 다시 고르기</x-import>
+      </sc-if>
+      <h1 style="margin:0;font:var(--type-hero-display);font-size:clamp(34px,6vw,56px);letter-spacing:var(--tracking-hero-display);text-wrap:balance">강의 URL만 넣으세요.</h1>
+      <p style="margin:0;font:var(--type-lead-airy);font-size:clamp(19px,2.4vw,24px);color:var(--text-secondary);max-width:600px;text-wrap:pretty">목차를 가져와 날짜별 학습 계획으로 나눠 드립니다.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:16px">
+        <span style="font:var(--type-caption-strong)">강의 사이트</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <sc-for list="{{ siteOpts }}" as="si" hint-placeholder-count="4">
+            <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.OptionChip" label="{{ si.label }}" detail="{{ si.detail }}" selected="{{ si.selected }}" on-click="{{ si.pick }}" style="{{ chipStyle }}" dc-props="{{ chipProps }}" hint-size="120px,44px"></x-import>
+          </sc-for>
+        </div>
+        <sc-if value="{{ siteNotice }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-caption)">{{ siteNotice }}</span></sc-if>
+      </div>
+      <div style="display:flex;gap:12px;width:100%;max-width:640px;flex-wrap:wrap;justify-content:center">
+        <input value="{{ url }}" onChange="{{ onUrl }}" onKeyDown="{{ onUrlKey }}" disabled="{{ isExtracting }}" placeholder="https://www.inflearn.com/course/..." style="flex:1 1 280px;min-width:0;height:48px;padding:0 22px;border-radius:980px;border:1px solid var(--color-hairline);background:var(--surface-canvas);font:var(--type-body);color:var(--text-primary)">
+        <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="primary" on-click="{{ submit }}" disabled="{{ isExtracting }}" style="height:48px" hint-size="140px,48px">목차 가져오기</x-import>
+      </div>
+      <sc-if value="{{ isExtracting }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;font:var(--type-body-strong)">
+          <span>강의 정보 가져오는 중…</span>
+          <span style="font:var(--type-body);color:var(--text-tertiary);font-variant-numeric:tabular-nums">{{ elapsedLabel }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:0;font:var(--type-caption);color:var(--text-primary);max-width:640px;text-wrap:pretty">{{ errorText }}</p>
+        <sc-if value="{{ hasDup }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.TextLink" on-click="{{ openDup }}" hint-size="140px,20px">계획확인에서 보기</x-import>
+        </sc-if>
+      </sc-if>
+      <sc-if value="{{ notExtracting }}" hint-placeholder-val="{{ true }}">
+        <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.TextLink" on-click="{{ fillSample }}" hint-size="140px,20px">예시 강의로 해보기</x-import>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isViewEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:980px;margin:0 auto;padding:clamp(56px,10vw,112px) 20px 80px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+      <h1 style="margin:0;font:var(--type-display-lg);font-size:clamp(28px,4vw,40px)">저장한 계획이 없어요.</h1>
+      <p style="margin:0;font:var(--type-body);color:var(--text-secondary)">계획짜기에서 강의를 불러와 계획을 만들면 여기에 모입니다.</p>
+      <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="primary" on-click="{{ goBuild }}" hint-size="110px,40px">계획짜기</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isMain }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:980px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:40px">
+
+      <sc-if value="{{ isViewList }}" hint-placeholder-val="{{ false }}">
+        <div style="padding-top:48px;display:flex;flex-direction:column;gap:16px">
+          <h1 style="margin:0;font:var(--type-display-lg);font-size:clamp(28px,4vw,40px)">계획확인</h1>
+          <div role="listbox" aria-label="저장한 계획" style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;overflow:hidden">
+            <sc-for list="{{ planRows }}" as="pr" hint-placeholder-count="2">
+              <button role="option" aria-selected="{{ pr.selected }}" onClick="{{ pr.pick }}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:16px;padding:16px 20px;border-top:{{ pr.borderTop }};background:{{ pr.bg }};box-shadow:{{ pr.bar }}">
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font:var(--type-body-strong);line-height:1.4">{{ pr.title }}</span>
+                  <span style="font:var(--type-caption);color:var(--text-secondary)">{{ pr.sub }}</span>
+                </span>
+                <sc-if value="{{ pr.selected }}" hint-placeholder-val="{{ false }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/check.svg" alt="" width="18" height="18" style="flex:none"></sc-if>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showSummary }}" hint-placeholder-val="{{ false }}">
+        <div style="position:{{ summaryPos }};top:0;z-index:4;margin:{{ summaryMargin }};padding:16px 20px;background:var(--surface-frosted);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--color-hairline-alpha);border-radius:{{ summaryRadius }}">
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 24px">
+            <span style="font:var(--type-tagline);flex:1 1 280px;min-width:0;text-wrap:balance">{{ summary.title }}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px 20px;font:var(--type-caption);color:var(--text-secondary)">
+              <sc-if value="{{ summary.countLabel }}" hint-placeholder-val="{{ false }}"><span style="white-space:nowrap">{{ summary.countLabel }}</span></sc-if>
+              <span style="white-space:nowrap">예상 {{ summary.est }}</span><span style="white-space:nowrap">{{ summary.range }}</span><span style="white-space:nowrap">학습일 {{ summary.days }}일</span><span style="white-space:nowrap;color:var(--text-primary);font-weight:{{ summary.warnWeight }}">경고 {{ summary.warns }}일</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showSettings }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;gap:20px;padding-top:{{ sectionTop }}">
+          <h2 style="margin:0;font:var(--type-display-lg);font-size:clamp(28px,4vw,40px)">일정 설정</h2>
+          <div style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:24px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font:var(--type-caption-strong)">요일별 가용 시간 (분, 0 = 쉬는 요일)</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                  <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.OptionChip" label="{{ p.label }}" selected="{{ p.selected }}" on-click="{{ p.pick }}" style="{{ chipStyle }}" dc-props="{{ chipProps }}" hint-size="150px,44px"></x-import>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px">
+                <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+                  <label style="display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:center">
+                    <span style="font:var(--type-caption);color:var(--text-secondary)">{{ w.label }}</span>
+                    <input type="text" inputmode="numeric" value="{{ w.value }}" onChange="{{ w.onChange }}" onBlur="{{ w.onBlur }}" style="width:100%;min-width:0;height:44px;text-align:center;border-radius:8px;border:{{ w.border }};background:{{ w.bg }};font:var(--type-body);font-variant-numeric:tabular-nums;color:var(--text-primary);padding:0 4px">
+                  </label>
+                </sc-for>
+              </div>
+              <sc-if value="{{ noStudyDays }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-caption)">학습할 요일을 하나 이상 정해 주세요.</span></sc-if>
+              <sc-if value="{{ minError }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-caption)">0~1440 사이 숫자로 입력해 주세요. 이전 값을 유지합니다.</span></sc-if>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px">
+              <label style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:var(--type-caption-strong)">허용 오차</span>
+                <span style="display:flex;align-items:center;gap:8px;font:var(--type-body)">하루 ±<input type="text" inputmode="numeric" value="{{ tol.value }}" onChange="{{ tol.onChange }}" onBlur="{{ tol.onBlur }}" style="width:64px;height:44px;text-align:center;border-radius:8px;border:{{ tol.border }};font:var(--type-body);color:var(--text-primary)">분까지 괜찮아요</span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:var(--type-caption-strong)">예상 학습시간</span>
+                <span style="display:flex;align-items:center;gap:8px;font:var(--type-body)">재생시간 ×<input type="text" inputmode="decimal" value="{{ mult.value }}" onChange="{{ mult.onChange }}" onBlur="{{ mult.onBlur }}" style="width:64px;height:44px;text-align:center;border-radius:8px;border:{{ mult.border }};font:var(--type-body);color:var(--text-primary)"></span>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:var(--type-caption-strong)">시작일</span>
+                <input type="date" value="{{ startDate }}" onChange="{{ onStart }}" style="height:44px;border-radius:8px;border:1px solid var(--color-hairline);padding:0 12px;font:var(--type-body);color:var(--text-primary);background:var(--surface-canvas)">
+              </label>
+            </div>
+            <sc-if value="{{ tolMultError }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-caption)">오차는 0 이상, 배수는 0.5~5 사이로 입력해 주세요. 이전 값을 유지합니다.</span></sc-if>
+            <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--color-divider-soft);padding-top:20px">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font:var(--type-caption-strong)">휴식일</span>
+                <span style="font:var(--type-caption);color:var(--text-secondary)">날짜를 눌러 휴식일로 지정하거나 해제하세요. 쉬는 요일과 시작일 이전은 고를 수 없어요.</span>
+              </div>
+              <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.IconButton" icon="https://unpkg.com/lucide-static@0.469.0/icons/chevron-left.svg" label="이전 달" on-click="{{ restPrev }}" hint-size="44px,44px"></x-import>
+                  <span style="flex:1;text-align:center;font:var(--type-body-strong)">{{ restMonthLabel }}</span>
+                  <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.IconButton" icon="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" label="다음 달" on-click="{{ restNext }}" hint-size="44px,44px"></x-import>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+                  <sc-for list="{{ calHead }}" as="h" hint-placeholder-count="7">
+                    <span style="text-align:center;font:var(--type-fine-print);color:var(--text-tertiary);padding:4px 0">{{ h }}</span>
+                  </sc-for>
+                  <sc-for list="{{ restCells }}" as="rc" hint-placeholder-count="35">
+                    <button onClick="{{ rc.toggle }}" disabled="{{ rc.disabled }}" aria-pressed="{{ rc.selected }}" class="cc-press" style="all:unset;box-sizing:border-box;height:44px;border-radius:22px;display:grid;place-items:center;font:var(--type-caption);font-variant-numeric:tabular-nums;cursor:{{ rc.cursor }};background:{{ rc.bg }};color:{{ rc.fg }};border:{{ rc.border }};visibility:{{ rc.vis }}">{{ rc.num }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ restDays }}" as="r" hint-placeholder-count="0">
+                  <button onClick="{{ r.remove }}" aria-label="휴식일 삭제" class="cc-press" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:980px;background:var(--surface-parchment);border:1px solid var(--color-hairline);font:var(--type-caption)">{{ r.label }}<img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" width="14" height="14" style="opacity:.6"></button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ showPlan }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;gap:20px;padding-top:{{ planTop }}">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <h2 style="margin:0;font:var(--type-display-lg);font-size:clamp(28px,4vw,40px);flex:1">{{ planHeading }}</h2>
+            <div style="display:flex;gap:8px">
+              <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+                <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.OptionChip" label="{{ t.label }}" selected="{{ t.selected }}" on-click="{{ t.pick }}" style="{{ chipStyle }}" dc-props="{{ chipProps }}" hint-size="80px,44px"></x-import>
+              </sc-for>
+            </div>
+          </div>
+
+          <sc-if value="{{ hasPlanError }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;padding:48px 24px;text-align:center;font:var(--type-body-strong)">{{ planError }}</div>
+          </sc-if>
+          <sc-if value="{{ showDndHint }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:8px 16px;align-items:center;flex-wrap:wrap;margin-top:-8px">
+              <span style="flex:1 1 280px;font:var(--type-caption);color:var(--text-secondary);text-wrap:pretty">{{ dndHint }}</span>
+              <sc-if value="{{ hasOverrides }}" hint-placeholder-val="{{ false }}">
+                <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.TextLink" on-click="{{ resetOverrides }}" hint-size="160px,20px">자동 배분으로 되돌리기</x-import>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showList }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;overflow:hidden">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="5">
+                <div onDragOver="{{ d.onDragOver }}" onDrop="{{ d.onDrop }}" style="display:grid;grid-template-columns:minmax(112px,150px) minmax(0,1fr);gap:8px 20px;padding:18px 24px;border-top:1px solid var(--color-divider-soft);background:{{ d.bg }};outline:{{ d.outline }};outline-offset:-2px">
+                  <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+                    <span style="font:var(--type-body-strong);line-height:1.4;white-space:nowrap">{{ d.dateLabel }} ({{ d.wd }})</span>
+                    <span style="font:var(--type-caption);color:var(--text-secondary);font-variant-numeric:tabular-nums">{{ d.total }}</span>
+                    <sc-if value="{{ d.isToday }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-fine-print);background:var(--color-primary);color:#fff;border-radius:980px;padding:5px 10px">오늘</span></sc-if>
+                    <sc-if value="{{ d.canMoveHere }}" hint-placeholder-val="{{ false }}">
+                      <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="secondary" on-click="{{ d.moveHere }}" hint-size="100px,32px">여기로 옮기기</x-import>
+                    </sc-if>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                    <sc-if value="{{ d.empty }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-caption);color:var(--text-tertiary);padding:6px 0">배정된 수업 없음</span></sc-if>
+                    <sc-for list="{{ d.items }}" as="it" hint-placeholder-count="2">
+                      <div draggable="{{ it.draggable }}" onDragStart="{{ it.onDragStart }}" onDragEnd="{{ dragEnd }}" onClick="{{ it.pick }}" aria-pressed="{{ it.picked }}" style="display:flex;gap:10px;align-items:center;min-width:0;padding:6px 8px;margin:0 -8px;border-radius:8px;cursor:{{ it.cursor }};user-select:none;background:{{ it.bg }};border:{{ it.border }};opacity:{{ it.opacity }}">
+                        <sc-if value="{{ it.editable }}" hint-placeholder-val="{{ false }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/grip-vertical.svg" alt="" width="16" height="16" style="flex:none;opacity:.4"></sc-if>
+                        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                          <span style="font:var(--type-fine-print);color:var(--text-tertiary)">{{ it.label }}</span>
+                          <span style="font:var(--type-body);text-wrap:pretty">{{ it.title }}</span>
+                        </div>
+                        <sc-if value="{{ it.moved }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font:var(--type-fine-print);background:var(--surface-chip-gray);border-radius:980px;padding:4px 10px">직접 옮김</span></sc-if>
+                        <span style="flex:none;font:var(--type-caption);color:var(--text-tertiary);font-variant-numeric:tabular-nums">{{ it.est }}</span>
+                        <sc-if value="{{ it.editable }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ it.remove }}" aria-label="계획에서 제외" title="계획에서 제외" class="cc-press" style="all:unset;cursor:pointer;flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--surface-parchment)"><img src="https://unpkg.com/lucide-static@0.469.0/icons/x.svg" alt="" width="14" height="14" style="opacity:.6"></button>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ d.out }}" hint-placeholder-val="{{ false }}">
+                      <span style="align-self:flex-start;font:var(--type-fine-print);background:var(--surface-tile-1);color:#fff;border-radius:980px;padding:6px 12px">{{ d.warnLabel }}</span>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showRemoved }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;overflow:hidden">
+              <div style="padding:16px 24px;font:var(--type-body-strong)">제외한 수업 {{ removedCount }}개</div>
+              <sc-for list="{{ removed }}" as="rm" hint-placeholder-count="1">
+                <div style="display:flex;gap:12px;align-items:center;padding:10px 24px;border-top:1px solid var(--color-divider-soft)">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <span style="font:var(--type-fine-print);color:var(--text-tertiary)">{{ rm.label }}</span>
+                    <span style="font:var(--type-body);color:var(--text-secondary)">{{ rm.title }}</span>
+                  </div>
+                  <span style="flex:none;font:var(--type-caption);color:var(--text-tertiary)">{{ rm.est }}</span>
+                  <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.TextLink" on-click="{{ rm.restore }}" hint-size="60px,20px">다시 넣기</x-import>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showCal }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+                <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.IconButton" icon="https://unpkg.com/lucide-static@0.469.0/icons/chevron-left.svg" label="이전 달" on-click="{{ prevMonth }}" hint-size="44px,44px"></x-import>
+                <span style="min-width:120px;text-align:center;font:var(--type-tagline)">{{ monthLabel }}</span>
+                <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.IconButton" icon="https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg" label="다음 달" on-click="{{ nextMonth }}" hint-size="44px,44px"></x-import>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--color-hairline);border-left:1px solid var(--color-hairline)">
+                <sc-for list="{{ calHead }}" as="h" hint-placeholder-count="7">
+                  <span style="text-align:center;font:var(--type-caption-strong);padding:10px 0;border-right:1px solid var(--color-hairline);border-bottom:2px solid var(--color-ink)">{{ h }}</span>
+                </sc-for>
+                <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+                  <button onClick="{{ c.pick }}" disabled="{{ c.blank }}" aria-pressed="{{ c.selected }}" style="all:unset;box-sizing:border-box;cursor:{{ c.cursor }};min-width:0;min-height:clamp(84px,12vw,132px);padding:8px;display:flex;flex-direction:column;gap:4px;overflow:hidden;border-right:1px solid var(--color-hairline);border-bottom:1px solid var(--color-hairline);background:{{ c.bg }};box-shadow:{{ c.ring }}">
+                    <span style="display:flex;align-items:center;gap:4px;min-width:0">
+                      <span style="flex:none;min-width:22px;height:22px;border-radius:11px;display:grid;place-items:center;padding:0 4px;font:var(--type-caption-strong);background:{{ c.numBg }};color:{{ c.numFg }}">{{ c.num }}</span>
+                      <sc-if value="{{ c.out }}" hint-placeholder-val="{{ false }}"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:var(--surface-tile-1)"></span></sc-if>
+                      <span style="margin-left:auto;font:var(--type-fine-print);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.time }}</span>
+                    </span>
+                    <sc-for list="{{ c.items }}" as="ci" hint-placeholder-count="0">
+                      <span style="display:block;font:var(--type-fine-print);line-height:1.5;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--surface-parchment);border-radius:4px;padding:1px 6px">{{ ci }}</span>
+                    </sc-for>
+                    <sc-if value="{{ c.more }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-fine-print);color:var(--text-secondary);padding:0 6px">+{{ c.moreCount }}</span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+              <span style="font:var(--type-fine-print);color:var(--text-tertiary);display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--surface-tile-1)"></span>허용 범위 밖 · 날짜를 누르면 그날 들을 수업이 아래에 표시됩니다.</span>
+              <sc-if value="{{ hasCalSel }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid var(--color-divider-soft);padding-top:16px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+                    <span style="font:var(--type-tagline);flex:1">{{ calSelLabel }}</span>
+                    <span style="font:var(--type-caption);color:var(--text-secondary)">{{ calSelTotal }}</span>
+                  </div>
+                  <sc-if value="{{ calSelEmpty }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-caption);color:var(--text-tertiary)">이 날은 배정된 수업이 없어요.</span></sc-if>
+                  <sc-for list="{{ calSelItems }}" as="si" hint-placeholder-count="0">
+                    <div style="display:flex;gap:12px;align-items:baseline;padding:8px 0;border-top:1px solid var(--color-divider-soft)">
+                      <span style="flex:none;font:var(--type-caption);color:var(--text-tertiary);font-variant-numeric:tabular-nums;width:20px">{{ si.n }}</span>
+                      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                        <span style="font:var(--type-fine-print);color:var(--text-tertiary)">{{ si.label }}</span>
+                        <span style="font:var(--type-body)">{{ si.title }}</span>
+                      </div>
+                      <span style="flex:none;font:var(--type-caption);color:var(--text-tertiary);font-variant-numeric:tabular-nums">{{ si.est }}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ calSelOut }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;font:var(--type-fine-print);background:var(--surface-tile-1);color:#fff;border-radius:980px;padding:6px 12px">{{ calSelWarn }}</span></sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ showToc }}" hint-placeholder-val="{{ false }}">
+        <section style="display:flex;flex-direction:column;gap:20px;padding-top:{{ sectionTop }}">
+          <sc-if value="{{ tocCollapsible }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ toggleToc }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;padding:20px 24px">
+              <span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font:var(--type-body-strong)">목차 편집</span><span style="font:var(--type-caption);color:var(--text-secondary)">{{ tocSummary }}</span></span>
+              <sc-if value="{{ tocOpen }}" hint-placeholder-val="{{ false }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-up.svg" alt="" width="18" height="18"></sc-if>
+              <sc-if value="{{ tocClosed }}" hint-placeholder-val="{{ true }}"><img src="https://unpkg.com/lucide-static@0.469.0/icons/chevron-down.svg" alt="" width="18" height="18"></sc-if>
+            </button>
+          </sc-if>
+          <sc-if value="{{ tocHeading }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font:var(--type-caption-strong);color:var(--text-tertiary)">인프런 · {{ course.instructor }}</span>
+              <h1 style="margin:0;font:var(--type-display-lg);font-size:clamp(28px,4vw,40px);text-wrap:balance">{{ course.title }}</h1>
+              <span style="font:var(--type-caption);color:var(--text-secondary)">{{ tocSummary }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tocBody }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:var(--type-caption);color:var(--text-tertiary)">{{ droppedNote }} 이미 들은 수업은 체크를 풀어 계획에서 빼세요.</span>
+              <sc-if value="{{ hasMissing }}" hint-placeholder-val="{{ false }}">
+                <div style="background:var(--surface-tile-1);color:#fff;border-radius:18px;padding:16px 24px;font:var(--type-caption)">재생시간이 없는 수업이 {{ missingCount }}개 있어요. 입력하기 전까지 배분에서 빠집니다.</div>
+              </sc-if>
+              <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
+                <div style="background:var(--surface-canvas);border:1px solid var(--color-hairline);border-radius:18px;overflow:hidden">
+                  <div style="display:flex;align-items:baseline;gap:12px;padding:16px 20px">
+                    <span style="font:var(--type-caption-strong);color:var(--text-tertiary);flex:none">섹션 {{ sec.num }}</span>
+                    <span style="flex:1;min-width:0;font:var(--type-body-strong)">{{ sec.title }}</span>
+                    <span style="font:var(--type-caption);color:var(--text-tertiary);flex:none">{{ sec.est }}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 72px 76px;gap:8px;padding:6px 20px;font:var(--type-fine-print);color:var(--text-tertiary);border-top:1px solid var(--color-divider-soft)">
+                    <span>추가</span><span>수업</span><span style="text-align:center">재생(분)</span><span style="text-align:right">예상</span>
+                  </div>
+                  <sc-for list="{{ sec.lessons }}" as="ls" hint-placeholder-count="4">
+                    <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 72px 76px;gap:8px;align-items:center;padding:6px 20px;border-top:1px solid var(--color-divider-soft);background:{{ ls.bg }}">
+                      <input type="checkbox" checked="{{ ls.included }}" onChange="{{ ls.onToggle }}" aria-label="계획에 추가" style="width:18px;height:18px;margin:0;accent-color:#0066cc;cursor:pointer">
+                      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                          <input value="{{ ls.title }}" onChange="{{ ls.onTitle }}" onBlur="{{ ls.onTitleBlur }}" style="flex:1;min-width:0;height:40px;border:{{ ls.titleBorder }};border-radius:8px;padding:0 8px;margin-left:-9px;background:transparent;font:var(--type-body);color:{{ ls.color }};text-decoration:{{ ls.deco }}">
+                          <sc-if value="{{ ls.missing }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font:var(--type-fine-print);background:var(--surface-tile-1);color:#fff;border-radius:980px;padding:4px 10px;white-space:nowrap">시간 누락</span></sc-if>
+                          <sc-if value="{{ ls.manual }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font:var(--type-fine-print);background:var(--surface-chip-gray);border-radius:980px;padding:4px 10px;white-space:nowrap">직접 입력</span></sc-if>
+                        </div>
+                        <sc-if value="{{ ls.err }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-fine-print);padding:2px 0 4px">{{ ls.err }}</span></sc-if>
+                      </div>
+                      <input type="text" inputmode="numeric" value="{{ ls.dur }}" onChange="{{ ls.onDur }}" onBlur="{{ ls.onDurBlur }}" placeholder="—" style="width:100%;min-width:0;height:40px;text-align:center;border-radius:8px;border:{{ ls.durBorder }};font:var(--type-body);font-variant-numeric:tabular-nums;background:var(--surface-canvas);color:var(--text-primary)">
+                      <span style="text-align:right;font:var(--type-caption);color:var(--text-secondary);font-variant-numeric:tabular-nums">{{ ls.est }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </section>
+      </sc-if>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;align-items:center">
+        <sc-for list="{{ footBtns }}" as="b" hint-placeholder-count="2">
+          <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="{{ b.variant }}" on-click="{{ b.onClick }}" disabled="{{ b.disabled }}" hint-size="90px,40px">{{ b.label }}</x-import>
+        </sc-for>
+      </div>
+      <span style="font:var(--type-fine-print);color:var(--text-tertiary);text-align:right;margin-top:-28px">{{ footNote }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.4);display:grid;place-items:center;padding:20px">
+      <div role="dialog" aria-modal="true" style="background:var(--surface-canvas);border-radius:18px;padding:28px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:12px">
+        <span style="font:var(--type-tagline)">{{ confirmTitle }}</span>
+        <span style="font:var(--type-body);color:var(--text-secondary)">{{ confirmBody }}</span>
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:12px">
+          <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="secondary" on-click="{{ cancelConfirm }}" hint-size="70px,40px">취소</x-import>
+          <x-import component-from-global-scope="CurrculatorDesignSystem_3f2207.Button" variant="primary" on-click="{{ doConfirm }}" hint-size="90px,40px">{{ confirmLabel }}</x-import>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:4px;padding:4px;border-radius:980px;background:rgba(29,29,31,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+    <sc-for list="{{ layoutOpts }}" as="o" hint-placeholder-count="2">
+      <button onClick="{{ o.pick }}" class="cc-press" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:980px;font:var(--type-caption);white-space:nowrap;background:{{ o.bg }};color:{{ o.fg }}">
+        <span style="font:var(--type-fine-print);font-weight:600;opacity:.7">{{ o.id }}</span>{{ o.label }}
+      </button>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;steps&quot;,&quot;single&quot;],&quot;default&quot;:&quot;steps&quot;,&quot;tsType&quot;:&quot;'steps' | 'single'&quot;},&quot;extractSeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:1,&quot;max&quot;:15,&quot;step&quot;:1,&quot;unit&quot;:&quot;초&quot;,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;}}">
+const PKEY = 'currculator:plans:v1', OLDKEY = 'currculator:draft:v1';
+const WD = ['일','월','화','수','목','금','토'];
+const ORDER = [1,2,3,4,5,6,0];
+const SAMPLE_URL = 'https://www.inflearn.com/course/%ED%81%B4%EB%A1%9C%EB%93%9C-%EC%BD%94%EB%93%9C-%EC%99%84%EB%B2%BD-%EB%A7%88%EC%8A%A4%ED%84%B0-ai-%EA%B0%9C%EB%B0%9C?cid=339317';
+const ERR = {
+  INVALID_URL: '링크 형식이 올바르지 않아요. 인프런 강의 페이지 주소를 붙여 넣어 주세요.',
+  UNSUPPORTED: '지금은 인프런 강의 페이지만 지원해요.',
+  NOT_FOUND: '강의를 찾을 수 없어요. 주소를 다시 확인해 주세요.',
+  FETCH_FAILED: '강의 정보를 가져오지 못했어요. 잠시 후 다시 시도해 주세요.',
+  NO_CURRICULUM: '이 페이지에서 커리큘럼을 찾지 못했어요.',
+  ALREADY_PLANNED: '이미 계획을 만든 강의예요. 강의 하나에는 계획 하나만 만들 수 있어요. 기존 계획을 수정해 주세요.'
+};
+function courseKey(raw) {
+  let s = (raw || '').trim(); if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try { const u = new URL(s); const cid = u.searchParams.get('cid'); if (cid) return 'cid:' + cid;
+    return 'path:' + decodeURIComponent(u.pathname.replace(/^\/(en|ja|vi)(?=\/)/, '')).replace(/\/$/, ''); } catch (e) { return s; }
+}
+const PRESETS = [
+  { label: '매일 60분', m: [60,60,60,60,60,60,60] },
+  { label: '평일만 60분', m: [0,60,60,60,60,60,0] },
+  { label: '평일 60분·주말 120분', m: [120,60,60,60,60,60,120] }
+];
+const SITES = [['inflearn', '인프런'], ['udemy', 'Udemy'], ['class101', '클래스101'], ['fastcampus', '패스트캠퍼스']];
+const todayKST = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+const parseD = s => { const [y,m,d] = s.split('-').map(Number); return new Date(Date.UTC(y, m-1, d)); };
+const addDays = (s, n) => { const d = parseD(s); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); };
+const dow = s => parseD(s).getUTCDay();
+const md = s => { const d = parseD(s); return `${d.getUTCMonth()+1}월 ${d.getUTCDate()}일`; };
+const fmtMin = m => { const r = Math.round(m), h = Math.floor(r/60), mm = r%60; return !h ? `${mm}분` : mm ? `${h}시간 ${mm}분` : `${h}시간`; };
+const clone = o => JSON.parse(JSON.stringify(o));
+
+function sampleCourse() {
+  const S = [
+    ['오리엔테이션', [['강의 소개와 학습 방법',312],['개발 환경 준비하기',648],['퀴즈: 환경 점검',0,'QUIZ']]],
+    ['TypeScript 기초', [['타입이 필요한 이유',742],['기본 타입과 타입 추론',1385],['인터페이스와 타입 별칭',1520],['유니언과 타입 좁히기',1210],['제네릭 입문',1690],['과제: 타입 연습',0,'ASSIGNMENT']]],
+    ['React 핵심', [['컴포넌트와 JSX',1102],['props와 state',1475],['이벤트 다루기',890],['useEffect 제대로 쓰기',1980],['커스텀 훅 만들기',1345]]],
+    ['상태 관리', [['상태 끌어올리기',960],['Context API',1260],['useReducer로 복잡한 상태 다루기',1720],['서버 상태와 클라이언트 상태',0]]],
+    ['데이터 가져오기', [['fetch와 에러 처리',1180],['로딩과 빈 상태 UI',845],['React Query 시작하기',2210],['낙관적 업데이트',1530],['퀴즈: 데이터 패칭',0,'QUIZ']]],
+    ['실전 프로젝트', [['프로젝트 구조 잡기',1410],['할 일 목록 화면',2480],['필터와 정렬',1630],['폼 검증',1890],['테스트 작성하기',2650],['배포하기',1120]]]
+  ];
+  let id = 100200, dropped = 0;
+  const sections = S.map((s, i) => ({ id: 's' + i, title: s[0], lessons: s[1].filter(l => { if (l[2]) { dropped++; return false; } return true; })
+    .map(l => ({ id: String(id++), title: l[0], durationSec: l[1], excluded: false, source: 'extracted' })) }));
+  return { title: '처음 배우는 React와 TypeScript 실전', instructor: '김도윤', url: SAMPLE_URL, dropped, sections };
+}
+
+function checkUrl(raw) {
+  let s = (raw || '').trim();
+  if (!s) return 'INVALID_URL';
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  let u; try { u = new URL(s); } catch (e) { return 'INVALID_URL'; }
+  if (!u.hostname.includes('.')) return 'INVALID_URL';
+  const h = u.hostname.replace(/^m\./, 'www.');
+  if (h === 'inf.run') return null;
+  if (h !== 'www.inflearn.com' && h !== 'inflearn.com') return 'UNSUPPORTED';
+  const p = u.pathname.replace(/^\/(en|ja|vi)(?=\/)/, '');
+  if (!p.startsWith('/course/')) return 'UNSUPPORTED';
+  return null;
+}
+
+function buildPlan(cur, st) {
+  const items = [];
+  cur.sections.forEach(sec => sec.lessons.forEach(l => { if (!l.excluded && l.durationSec > 0) items.push({ ...l, section: sec.title, est: l.durationSec * st.mult / 60 }); }));
+  if (st.minutes.every(m => !(m > 0))) return { error: 'NO_STUDY_DAYS', items, days: [] };
+  if (!items.length) return { error: 'NO_ITEMS', items, days: [] };
+  const rest = new Set(st.restDays), days = [];
+  let i = 0, d = st.startDate, guard = 0;
+  while (i < items.length && guard++ < 4000) {
+    const a = st.minutes[dow(d)];
+    if (a > 0 && !rest.has(d)) {
+      const lo = Math.max(0, a - st.tol), hi = a + st.tol, eps = 1e-9;
+      let cum = 0, best = null, bestIn = null;
+      for (let k = i; k < items.length; k++) {
+        cum += items[k].est;
+        const c = { k, cum, dist: Math.abs(cum - a) };
+        if (cum >= lo - eps && cum <= hi + eps && (!bestIn || c.dist < bestIn.dist - eps)) bestIn = c;
+        if (!best || c.dist < best.dist - eps) best = c;
+        if (cum > hi) break;
+      }
+      const pick = bestIn || best;
+      days.push({ date: d, target: a, items: items.slice(i, pick.k + 1), total: pick.cum, out: !bestIn });
+      i = pick.k + 1;
+    }
+    d = addDays(d, 1);
+  }
+  return { days, items };
+}
+
+// overrides: { [lessonId]: 'YYYY-MM-DD' (moved) | null (removed) }
+function computePlan(course, st, ov) {
+  ov = ov || {};
+  const base = buildPlan(course, st);
+  if (base.error) return { error: base.error, days: [], removed: [], baseDate: {} };
+  const baseDate = {}, order = {};
+  base.days.forEach(d => d.items.forEach(it => baseDate[it.id] = d.date));
+  base.items.forEach((it, i) => order[it.id] = i);
+  const map = {}, removed = [];
+  base.days.forEach(d => map[d.date] = { date: d.date, target: d.target, items: d.items.filter(it => !(it.id in ov)) });
+  base.items.forEach(it => {
+    if (!(it.id in ov)) return;
+    const t = ov[it.id];
+    if (t === null) { removed.push(it); return; }
+    if (!map[t]) map[t] = { date: t, target: st.minutes[dow(t)], items: [] };
+    map[t].items.push({ ...it, moved: true });
+  });
+  const days = Object.values(map).sort((a, b) => a.date < b.date ? -1 : 1).map(d => {
+    d.items.sort((a, b) => order[a.id] - order[b.id]);
+    const total = d.items.reduce((a, x) => a + x.est, 0), lo = Math.max(0, d.target - st.tol), hi = d.target + st.tol;
+    return { ...d, total, out: d.items.length > 0 && !(total >= lo - 1e-9 && total <= hi + 1e-9) };
+  });
+  return { days, removed, baseDate };
+}
+
+const validPlan = p => p && p.course && Array.isArray(p.course.sections) && p.settings && Array.isArray(p.settings.minutes) && p.settings.minutes.length === 7;
+function loadPlans() {
+  try {
+    const raw = localStorage.getItem(PKEY);
+    if (raw) { const v = JSON.parse(raw); if (v && v.version === 1 && Array.isArray(v.plans)) return v.plans.filter(validPlan); }
+    const old = localStorage.getItem(OLDKEY);
+    if (old) {
+      localStorage.removeItem(OLDKEY);
+      const v = JSON.parse(old), p = { id: 'p' + Date.now(), course: v.curriculum, settings: v.settings, overrides: v.overrides || {}, savedAt: v.savedAt };
+      if (validPlan(p)) return [p];
+    }
+  } catch (e) {}
+  return [];
+}
+const defaultSettings = () => ({ startDate: todayKST(), minutes: [60,60,60,60,60,60,60], tol: 10, mult: 1.5, restDays: [] });
+const buildDefaults = () => ({ phase: 'idle', idleStage: 'type', stage: 'edit', url: '', elapsed: 0, error: null, course: null, settings: defaultSettings(),
+  overrides: {}, editingId: null, drafts: {}, picked: null, dragId: null, dragOver: null, restMonth: null, tocOpen: false, site: 'inflearn', siteNotice: '', bookNotice: false, dupId: null });
+
+class Component extends DCLogic {
+  state = (() => { const plans = loadPlans(); return { layout: null, plans, menu: plans.length ? 'view' : 'build', viewSel: 'all', view: 'list', calMonth: null, calSel: null, confirm: null, ...buildDefaults() }; })();
+
+  persist() {
+    if (this._sp === this.state.plans) return;
+    this._sp = this.state.plans;
+    try { localStorage.setItem(PKEY, JSON.stringify({ version: 1, plans: this.state.plans })); } catch (e) {}
+  }
+  componentWillUnmount() { clearInterval(this.tick); clearTimeout(this.done); }
+  layout() { return this.state.layout || this.props.layout || 'steps'; }
+  top() { window.scrollTo(0, 0); }
+
+  submit = () => {
+    if (this.state.phase === 'extracting') return;
+    const err = checkUrl(this.state.url);
+    if (err) return this.setState({ error: err, dupId: null });
+    const key = courseKey(this.state.url), dupPre = this.state.plans.find(p => courseKey(p.course.url) === key);
+    if (dupPre) return this.setState({ error: 'ALREADY_PLANNED', dupId: dupPre.id });
+    const t0 = Date.now();
+    this.setState({ phase: 'extracting', error: null, dupId: null, elapsed: 0 });
+    this.tick = setInterval(() => this.setState({ elapsed: Math.floor((Date.now() - t0) / 1000) }), 250);
+    this.done = setTimeout(() => {
+      clearInterval(this.tick);
+      const c = sampleCourse(); c.url = this.state.url.trim();
+      const dup = this.state.plans.find(p => p.course.title === c.title && p.course.instructor === c.instructor);
+      if (dup) { this.setState({ phase: 'idle', error: 'ALREADY_PLANNED', dupId: dup.id }); return; }
+      this.setState({ phase: 'planning', stage: 'edit', course: c, overrides: {}, drafts: {}, calMonth: null, settings: { ...this.state.settings, startDate: todayKST() } });
+      this.top();
+    }, (this.props.extractSeconds ?? 4) * 1000);
+  };
+  makePlan = () => {
+    const s = this.state, id = 'p' + Date.now();
+    const p = { id, course: s.course, settings: s.settings, overrides: s.overrides || {}, savedAt: new Date().toISOString() };
+    this.setState({ plans: [...s.plans, p], menu: 'view', viewSel: id, calMonth: null, ...buildDefaults() }); this.top();
+  };
+  savePlan = () => {
+    const s = this.state, id = s.editingId;
+    this.setState({ plans: s.plans.map(p => p.id === id ? { ...p, course: s.course, settings: s.settings, overrides: s.overrides || {}, savedAt: new Date().toISOString() } : p),
+      menu: 'view', viewSel: id, calMonth: null, ...buildDefaults() }); this.top();
+  };
+  editPlan(id) {
+    const p = this.state.plans.find(x => x.id === id); if (!p) return;
+    this.setState({ ...buildDefaults(), menu: 'build', phase: 'planning', stage: 'adjust', editingId: id, url: p.course.url || '',
+      course: clone(p.course), settings: clone(p.settings), overrides: clone(p.overrides || {}), calMonth: null }); this.top();
+  }
+
+  setSettings(patch) { this.setState(s => ({ settings: { ...s.settings, ...patch } })); }
+  updLesson(id, patch) {
+    this.setState(s => ({ course: { ...s.course, sections: s.course.sections.map(sec => ({ ...sec, lessons: sec.lessons.map(l => l.id === id ? { ...l, ...patch } : l) })) } }));
+  }
+  field(key, current, parse, commit) {
+    const draft = this.state.drafts[key];
+    const err = draft !== undefined && parse(draft) === null;
+    return {
+      value: draft !== undefined ? draft : String(current), err,
+      border: err ? '2px solid #1d1d1f' : '1px solid var(--color-hairline)',
+      onChange: e => { const v = e.target.value, p = parse(v); this.setState(s => ({ drafts: { ...s.drafts, [key]: v } })); if (p !== null) commit(p); },
+      onBlur: () => { if (!err) this.setState(s => { const d = { ...s.drafts }; delete d[key]; return { drafts: d }; }); }
+    };
+  }
+  clearDrafts(prefix) { this.setState(s => { const d = {}; Object.keys(s.drafts).forEach(k => { if (!k.startsWith(prefix)) d[k] = s.drafts[k]; }); return { drafts: d }; }); }
+  go = stage => { this.setState({ stage, picked: null }); this.top(); };
+
+  renderVals() {
+    this.persist();
+    const s = this.state, L = this.layout(), steps = L === 'steps', single = !steps;
+    const isView = s.menu === 'view', isBuild = !isView;
+    const planning = s.phase === 'planning' && !!s.course, editing = !!s.editingId;
+    const st = s.settings, today = todayKST(), stage = s.stage;
+    const intP = max => v => /^\s*\d+\s*$/.test(v) && +v <= max ? +v : null;
+    const multP = v => { const n = parseFloat(v); return /^\s*\d*\.?\d+\s*$/.test(v) && n >= 0.5 && n <= 5 ? n : null; };
+
+    // active plan source
+    const selPlan = isView && s.viewSel !== 'all' ? s.plans.find(p => p.id === s.viewSel) : null;
+    let src = null;
+    if (isBuild && planning) src = { ...computePlan(s.course, st, s.overrides), title: s.course.title, editable: true };
+    else if (selPlan) src = { ...computePlan(selPlan.course, selPlan.settings, selPlan.overrides), title: selPlan.course.title, editable: false };
+    else if (isView && s.plans.length) {
+      const map = {};
+      s.plans.forEach(p => computePlan(p.course, p.settings, p.overrides).days.forEach(d => {
+        if (!d.items.length) return;
+        const m = map[d.date] || (map[d.date] = { date: d.date, items: [], total: 0, out: false });
+        m.items.push(...d.items.map(it => ({ ...it, planTitle: p.course.title }))); m.total += d.total; if (d.out) m.out = true;
+      }));
+      src = { days: Object.values(map).sort((a, b) => a.date < b.date ? -1 : 1), removed: [], baseDate: {}, title: '전체 계획', editable: false, multi: true };
+    }
+    const days = src ? src.days : [], ed = !!(src && src.editable), baseDate = src ? src.baseDate : {};
+    const curDate = {}; days.forEach(d => d.items.forEach(it => curDate[it.id] = d.date));
+    const setOv = fn => this.setState(ps => { const ov = { ...ps.overrides }; fn(ov); return { overrides: ov, picked: null, dragId: null, dragOver: null }; });
+    const moveTo = (id, date) => setOv(ov => { if (baseDate[id] === date) delete ov[id]; else ov[id] = date; });
+
+    // TOC
+    let missingCount = 0, playSec = 0, count = 0;
+    const sections = planning ? s.course.sections.map((sec, si) => {
+      let secEst = 0;
+      const lessons = sec.lessons.map(l => {
+        const missing = !(l.durationSec > 0);
+        if (missing && !l.excluded) missingCount++;
+        if (!l.excluded && !missing) { playSec += l.durationSec; count++; secEst += l.durationSec * st.mult / 60; }
+        const dur = this.field('dur-' + l.id, missing ? '' : Math.round(l.durationSec / 60), intP(1440), m => this.updLesson(l.id, { durationSec: m * 60, source: 'manual' }));
+        const ti = this.field('title-' + l.id, l.title, v => v.trim() ? v : null, v => this.updLesson(l.id, { title: v }));
+        return {
+          title: ti.value, onTitle: ti.onChange, onTitleBlur: ti.onBlur, titleBorder: ti.err ? '2px solid #1d1d1f' : '1px solid transparent',
+          dur: dur.value, onDur: dur.onChange, onDurBlur: dur.onBlur,
+          durBorder: dur.err || (missing && !l.excluded) ? '2px solid #1d1d1f' : '1px solid var(--color-hairline)',
+          err: ti.err ? '제목을 비울 수 없어요' : dur.err ? '0~1440 사이 분으로 입력해 주세요' : '',
+          included: !l.excluded, onToggle: () => this.updLesson(l.id, { excluded: !l.excluded }),
+          missing: missing && !l.excluded, manual: l.source === 'manual' && !missing,
+          est: l.excluded || missing ? '—' : fmtMin(l.durationSec * st.mult / 60),
+          color: l.excluded ? 'var(--text-tertiary)' : 'var(--text-primary)', deco: l.excluded ? 'line-through' : 'none',
+          bg: l.excluded ? 'var(--surface-pearl)' : 'var(--surface-canvas)'
+        };
+      });
+      return { num: si + 1, title: sec.title, est: fmtMin(secEst), lessons };
+    }) : [];
+
+    // settings
+    const fields = ORDER.map(di => ({ di, f: this.field('min-' + di, st.minutes[di], intP(1440), v => this.setSettings({ minutes: st.minutes.map((x, j) => j === di ? v : x) })) }));
+    const tol = this.field('tol', st.tol, intP(1440), v => this.setSettings({ tol: v }));
+    const mult = this.field('mult', st.mult, multP, v => this.setSettings({ mult: v }));
+
+    // rest calendar
+    const rm = s.restMonth || st.startDate.slice(0, 7), [ry, rmo] = rm.split('-').map(Number);
+    const rLead = new Date(Date.UTC(ry, rmo - 1, 1)).getUTCDay(), rDim = new Date(Date.UTC(ry, rmo, 0)).getUTCDate();
+    const restSet = new Set(st.restDays), restCells = [];
+    for (let i = 0; i < rLead; i++) restCells.push({ num: '', vis: 'hidden', disabled: true, bg: 'transparent', fg: 'inherit', border: 'none', cursor: 'default', selected: false });
+    for (let dn = 1; dn <= rDim; dn++) {
+      const ds = `${ry}-${String(rmo).padStart(2, '0')}-${String(dn).padStart(2, '0')}`;
+      const off = ds < st.startDate || !(st.minutes[dow(ds)] > 0), sel = restSet.has(ds);
+      restCells.push({ num: dn, vis: 'visible', disabled: off, selected: sel, cursor: off ? 'default' : 'pointer',
+        toggle: () => this.setSettings({ restDays: sel ? st.restDays.filter(x => x !== ds) : [...st.restDays, ds].sort() }),
+        bg: sel ? 'var(--color-ink)' : 'transparent', fg: sel ? '#fff' : off ? 'var(--color-hairline)' : 'var(--text-primary)',
+        border: ds === today && !sel ? '1px solid var(--color-ink)' : '1px solid transparent' });
+    }
+    const shiftRest = n => () => { const d = new Date(Date.UTC(ry, rmo - 1 + n, 1)); this.setState({ restMonth: d.toISOString().slice(0, 7) }); };
+
+    // plan calendar
+    let defMonth = (selPlan ? selPlan.settings.startDate : isBuild ? st.startDate : (days[0] ? days[0].date : today)).slice(0, 7);
+    if (days.length && today >= days[0].date && today <= days[days.length - 1].date) defMonth = today.slice(0, 7);
+    const [cy, cmo] = (s.calMonth || defMonth).split('-').map(Number);
+    const lead = new Date(Date.UTC(cy, cmo - 1, 1)).getUTCDay(), dim = new Date(Date.UTC(cy, cmo, 0)).getUTCDate();
+    const byDate = {}; days.forEach(d => byDate[d.date] = d);
+    const monthPrefix = `${cy}-${String(cmo).padStart(2, '0')}`;
+    let calSel = s.calSel && s.calSel.startsWith(monthPrefix) ? s.calSel : null;
+    if (!s.calSel) { const t = byDate[today]; if (today.startsWith(monthPrefix) && t && t.items.length) calSel = today; else { const f = days.find(d => d.items.length && d.date.startsWith(monthPrefix)); calSel = f ? f.date : null; } }
+    const MAXI = 3, cells = [];
+    for (let i = 0; i < lead; i++) cells.push({ num: '', blank: true, items: [], more: false, out: false, time: '', bg: 'var(--surface-pearl)', ring: 'none', cursor: 'default', numBg: 'transparent', numFg: 'inherit', selected: false });
+    for (let dn = 1; dn <= dim; dn++) {
+      const ds = `${monthPrefix}-${String(dn).padStart(2, '0')}`, d = byDate[ds], has = !!(d && d.items.length), isT = ds === today, sel = calSel === ds;
+      const titles = has ? d.items.map(it => it.title) : [];
+      cells.push({ num: dn, blank: false, selected: sel, time: has ? fmtMin(d.total) : '', out: !!(d && d.out),
+        items: titles.slice(0, MAXI), more: titles.length > MAXI, moreCount: titles.length - MAXI,
+        pick: () => this.setState({ calSel: ds }), cursor: 'pointer',
+        bg: sel ? 'var(--surface-parchment)' : 'var(--surface-canvas)', ring: sel ? 'inset 0 0 0 2px var(--color-primary-focus)' : 'none',
+        numBg: isT ? 'var(--color-primary)' : 'transparent', numFg: isT ? '#fff' : has ? 'var(--text-primary)' : 'var(--text-tertiary)' });
+    }
+    const selDay = calSel ? byDate[calSel] : null;
+    const shiftMonth = n => () => { const d = new Date(Date.UTC(cy, cmo - 1 + n, 1)); this.setState({ calMonth: d.toISOString().slice(0, 7), calSel: null }); };
+
+    // steps
+    const stepDefs = editing ? [['목차 확인', 'edit'], ['일정 설정', 'schedule'], ['계획 수정', 'adjust']]
+      : [['학습 자료', 'type'], ['URL 입력', 'url'], ['목차 확인', 'edit'], ['일정 설정', 'schedule']];
+    const curIdx = stepDefs.findIndex(x => x[1] === (planning ? stage : s.idleStage));
+
+    // visibility
+    const showToc = isBuild && planning && (single || stage === 'edit');
+    const showSettings = isBuild && planning && (single || stage === 'schedule');
+    const showPlan = !!src && (isView || single || stage === 'adjust');
+    const activeDays = days.filter(d => d.items.length);
+    const totalEst = activeDays.reduce((a, d) => a + d.total, 0), warns = activeDays.filter(d => d.out).length;
+
+    // footer
+    const B = (label, variant, onClick, disabled) => ({ label, variant, onClick, disabled: !!disabled });
+    const planOk = !!(src && !src.error);
+    let footBtns = [];
+    if (isBuild && planning) {
+      const finish = editing ? B('저장', 'primary', this.savePlan, !planOk) : B('계획하기', 'primary', this.makePlan, !planOk);
+      const quit = editing ? B('취소', 'secondary', () => { this.setState({ ...buildDefaults(), menu: 'view' }); this.top(); }) : B('처음부터', 'secondary', () => this.setState({ confirm: { kind: 'reset' } }));
+      if (single) footBtns = [quit, finish];
+      else if (stage === 'edit') footBtns = [quit, B('일정 설정', 'primary', () => this.go('schedule'))];
+      else if (stage === 'schedule') footBtns = [B('이전', 'secondary', () => this.go('edit')), editing ? B('계획 수정', 'primary', () => this.go('adjust')) : finish];
+      else footBtns = [B('일정 설정', 'secondary', () => this.go('schedule')), quit, finish];
+    } else if (selPlan) {
+      footBtns = [B('삭제', 'secondary', () => this.setState({ confirm: { kind: 'delete', id: selPlan.id } })), B('계획 수정', 'primary', () => this.editPlan(selPlan.id))];
+    }
+
+    const cf = s.confirm;
+    const confirmText = !cf ? ['', '', ''] : cf.kind === 'delete' ? ['이 계획을 삭제할까요?', '삭제한 계획은 되돌릴 수 없어요.', '삭제'] : ['처음부터 다시 할까요?', '작성 중인 내용이 지워져요.', '처음부터'];
+
+    return {
+      navLinks: ['계획짜기', '계획확인'], navActive: isView ? '계획확인' : '계획짜기',
+      onNavigate: label => { this.setState({ menu: label === '계획확인' ? 'view' : 'build', picked: null, calMonth: null }); this.top(); },
+      onBrand: () => { this.setState({ menu: 'build' }); this.top(); },
+      chipStyle: { width: 'auto', flex: 'none', whiteSpace: 'nowrap' },
+      chipProps: { style: { width: 'auto', whiteSpace: 'nowrap', paddingLeft: 18, paddingRight: 18 } },
+
+      showStepBar: steps && isBuild, editing,
+      steps: stepDefs.map(([label, key], i) => {
+        const active = i === curIdx, reachable = planning ? ['edit', 'schedule', 'adjust'].includes(key) : i <= curIdx;
+        return { num: i + 1, label,
+          go: () => { if (planning && reachable) this.go(key); else if (!planning && key === 'type' && s.phase !== 'extracting') this.setState({ idleStage: 'type' }); },
+          color: active ? 'var(--text-primary)' : reachable ? 'var(--text-secondary)' : 'var(--text-tertiary)', weight: active ? 600 : 400,
+          dotBg: active ? 'var(--color-ink)' : i < curIdx ? 'var(--surface-chip-gray)' : 'transparent', dotFg: active ? '#fff' : 'var(--text-secondary)' };
+      }),
+
+      isTypeStep: isBuild && !planning && s.idleStage === 'type', isUrlStep: isBuild && !planning && s.idleStage === 'url',
+      sourceOpts: [
+        { title: '강의 커리큘럼', desc: '온라인 강의 URL로 목차를 가져와요.', isCourse: true, soon: false, border: '1px solid var(--color-hairline)', pick: () => this.setState({ idleStage: 'url', bookNotice: false }) },
+        { title: '책 목차', desc: 'ISBN으로 책의 목차와 쪽수를 가져와요.', isCourse: false, soon: true, border: s.bookNotice ? '2px solid var(--color-primary-focus)' : '1px solid var(--color-hairline)', pick: () => this.setState({ bookNotice: true }) }
+      ],
+      bookNotice: s.bookNotice, backToType: () => this.setState({ idleStage: 'type', error: null }),
+      siteOpts: SITES.map(([id, label]) => ({ label, detail: id === 'inflearn' ? '' : '준비 중', selected: s.site === id,
+        pick: () => id === 'inflearn' ? this.setState({ site: id, siteNotice: '' }) : this.setState({ siteNotice: `${label} 강의는 준비 중이에요. 지금은 인프런만 지원해요.` }) })),
+      siteNotice: s.siteNotice,
+      isExtracting: s.phase === 'extracting', notExtracting: s.phase !== 'extracting',
+      url: s.url, onUrl: e => this.setState({ url: e.target.value, error: null }), onUrlKey: e => { if (e.key === 'Enter') this.submit(); },
+      submit: this.submit, fillSample: () => this.setState({ url: SAMPLE_URL, error: null }),
+      elapsedLabel: `${s.elapsed}초`, hasError: !!s.error, errorText: ERR[s.error] || '',
+
+      isViewEmpty: isView && !s.plans.length, goBuild: () => this.setState({ menu: 'build' }),
+      isMain: (isBuild && planning) || (isView && s.plans.length > 0), isViewList: isView && s.plans.length > 0,
+      planRows: [{ id: 'all', title: '전체 계획', sub: `저장한 계획 ${s.plans.length}개를 날짜별로 함께 보기` }]
+        .concat(s.plans.map(p => { const r = computePlan(p.course, p.settings, p.overrides), ad = r.days.filter(d => d.items.length);
+          return { id: p.id, title: p.course.title, sub: ad.length ? `${md(ad[0].date)} ~ ${md(ad[ad.length - 1].date)} · 학습일 ${ad.length}일 · 예상 ${fmtMin(ad.reduce((a, d) => a + d.total, 0))}` : '배정된 수업 없음' }; }))
+        .map((row, i) => { const on = row.id === 'all' ? !selPlan : !!selPlan && selPlan.id === row.id;
+          return { ...row, selected: on, borderTop: i ? '1px solid var(--color-divider-soft)' : 'none', bg: on ? 'var(--surface-pearl)' : 'var(--surface-canvas)',
+            bar: on ? 'inset 3px 0 0 var(--color-primary-focus)' : 'none', pick: () => this.setState({ viewSel: row.id, calMonth: null, calSel: null }) }; }),
+      hasCalSel: !!calSel, calSelLabel: calSel ? `${md(calSel)} (${WD[dow(calSel)]})` : '', calSelTotal: selDay && selDay.items.length ? `예상 ${fmtMin(selDay.total)}` : '',
+      calSelEmpty: !!calSel && !(selDay && selDay.items.length), calSelOut: !!(selDay && selDay.out),
+      calSelWarn: selDay ? (src && src.multi ? '허용 범위 밖' : `허용 범위 밖 · 목표 ${fmtMin(selDay.target)} / 실제 ${fmtMin(selDay.total)}`) : '',
+      calSelItems: selDay ? selDay.items.map((it, i) => ({ n: i + 1, title: it.title, label: src.multi ? `${it.planTitle} · ${it.section}` : it.section, est: fmtMin(it.est) })) : [],
+      hasDup: !!s.dupId, openDup: () => { this.setState({ menu: 'view', viewSel: s.dupId, calMonth: null, calSel: null, error: null, dupId: null }); this.top(); },
+
+      showSummary: showPlan, summaryPos: single && isBuild ? 'sticky' : 'relative',
+      summaryMargin: single && isBuild ? '0 -20px' : '0', summaryRadius: single && isBuild ? '0' : '18px',
+      summary: { title: src ? src.title : '', countLabel: src && src.multi ? `계획 ${s.plans.length}개` : '', est: fmtMin(totalEst),
+        range: activeDays.length ? `${md(activeDays[0].date)} ~ ${md(activeDays[activeDays.length - 1].date)}` : '—', days: activeDays.length, warns, warnWeight: warns ? 600 : 400 },
+      sectionTop: steps ? '48px' : '0', planTop: steps && isBuild ? '48px' : '0',
+
+      showSettings,
+      presets: PRESETS.map(p => ({ label: p.label, selected: p.m.every((x, i) => x === st.minutes[i]), pick: () => { this.clearDrafts('min-'); this.setSettings({ minutes: p.m.slice() }); } })),
+      weekdays: fields.map(({ di, f }) => ({ label: WD[di], value: f.value, onChange: f.onChange, onBlur: f.onBlur, border: f.border, bg: st.minutes[di] > 0 ? 'var(--surface-canvas)' : 'var(--surface-parchment)' })),
+      tol, mult, noStudyDays: st.minutes.every(m => !(m > 0)), minError: fields.some(x => x.f.err), tolMultError: tol.err || mult.err,
+      startDate: st.startDate, onStart: e => { if (e.target.value) this.setSettings({ startDate: e.target.value }); this.setState({ calMonth: null, restMonth: null }); },
+      restCells, restMonthLabel: `${ry}년 ${rmo}월`, restPrev: shiftRest(-1), restNext: shiftRest(1),
+      restDays: st.restDays.map(r => ({ label: `${md(r)} (${WD[dow(r)]})`, remove: () => this.setSettings({ restDays: st.restDays.filter(x => x !== r) }) })),
+
+      showPlan, planHeading: isView ? (src && src.multi ? '날짜별 전체 일정' : '일정') : editing ? '계획 수정' : '계획 미리보기',
+      tabs: [['목록', 'list'], ['달력', 'calendar']].map(([label, v]) => ({ label, selected: s.view === v, pick: () => this.setState({ view: v }) })),
+      hasPlanError: !!(src && src.error), planError: src && src.error === 'NO_STUDY_DAYS' ? '학습할 요일을 하나 이상 정해 주세요.' : '배정할 수업이 없어요.',
+      showList: planOk && s.view === 'list', showCal: planOk && s.view === 'calendar',
+      showDndHint: planOk && ed && s.view === 'list',
+      dndHint: s.picked ? '옮길 날짜에서 "여기로 옮기기"를 누르세요. 같은 수업을 다시 누르면 선택이 풀려요.' : '수업을 끌어 다른 날짜에 놓으면 일정이 바뀝니다. 끌기 어려우면 수업을 눌러 선택한 뒤 옮길 날짜를 고르세요. ×를 누르면 계획에서 빠집니다.',
+      hasOverrides: ed && Object.keys(s.overrides || {}).length > 0, resetOverrides: () => this.setState({ overrides: {}, picked: null }),
+      dragEnd: () => this.setState({ dragId: null, dragOver: null }),
+      days: days.map(d => ({ dateLabel: md(d.date), wd: WD[dow(d.date)], isToday: d.date === today, total: fmtMin(d.total), out: d.out, empty: !d.items.length,
+        warnLabel: src.multi ? '허용 범위 밖' : `허용 범위 밖 · 목표 ${fmtMin(d.target)} / 실제 ${fmtMin(d.total)}`,
+        bg: s.dragOver === d.date ? 'var(--surface-parchment)' : d.date === today ? 'var(--surface-pearl)' : 'var(--surface-canvas)',
+        outline: ed && s.dragOver === d.date ? '2px solid var(--color-primary-focus)' : 'none',
+        canMoveHere: ed && !!s.picked && curDate[s.picked] !== d.date, moveHere: () => moveTo(s.picked, d.date),
+        onDragOver: ed ? e => { if (!this.state.dragId) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (this.state.dragOver !== d.date) this.setState({ dragOver: d.date }); } : undefined,
+        onDrop: ed ? e => { e.preventDefault(); const id = this.state.dragId || e.dataTransfer.getData('text/plain'); if (id && curDate[id] !== d.date) moveTo(id, d.date); else this.setState({ dragId: null, dragOver: null }); } : undefined,
+        items: d.items.map(it => ({ title: it.title, label: src.multi ? `${it.planTitle} · ${it.section}` : it.section, est: fmtMin(it.est),
+          moved: ed && !!it.moved, editable: ed, draggable: ed, cursor: ed ? 'grab' : 'default', picked: s.picked === it.id,
+          bg: s.picked === it.id ? 'var(--surface-parchment)' : 'transparent',
+          border: s.picked === it.id ? '2px solid var(--color-primary-focus)' : '2px solid transparent',
+          opacity: s.dragId === it.id ? 0.4 : 1,
+          pick: ed ? () => this.setState({ picked: s.picked === it.id ? null : it.id }) : undefined,
+          remove: e => { e.stopPropagation(); setOv(ov => { ov[it.id] = null; }); },
+          onDragStart: ed ? e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', it.id); this.setState({ dragId: it.id, picked: null }); } : undefined })) })),
+      showRemoved: planOk && ed && s.view === 'list' && src.removed.length > 0, removedCount: src ? src.removed.length : 0,
+      removed: ed ? src.removed.map(it => ({ title: it.title, label: it.section, est: fmtMin(it.est), restore: () => setOv(ov => { delete ov[it.id]; }) })) : [],
+      monthLabel: `${cy}년 ${cmo}월`, prevMonth: shiftMonth(-1), nextMonth: shiftMonth(1), calHead: WD, cells,
+
+      showToc, tocCollapsible: single, tocHeading: steps, tocBody: steps || s.tocOpen,
+      toggleToc: () => this.setState({ tocOpen: !s.tocOpen }), tocOpen: s.tocOpen, tocClosed: !s.tocOpen,
+      tocSummary: `계획에 넣을 수업 ${count}개 · 재생 ${fmtMin(playSec / 60)} · 예상 ${fmtMin(playSec * st.mult / 60)}`,
+      course: s.course || {}, sections, hasMissing: missingCount > 0, missingCount,
+      droppedNote: s.course && s.course.dropped ? `퀴즈·과제 ${s.course.dropped}개는 목차에서 뺐어요.` : '',
+
+      footBtns, footNote: isView ? '저장한 계획은 이 브라우저에 보관됩니다.' : editing ? '저장을 눌러야 변경 내용이 반영돼요.' : '',
+      confirmOpen: !!cf, confirmTitle: confirmText[0], confirmBody: confirmText[1], confirmLabel: confirmText[2],
+      cancelConfirm: () => this.setState({ confirm: null }),
+      doConfirm: () => {
+        if (cf && cf.kind === 'delete') this.setState({ confirm: null, plans: s.plans.filter(p => p.id !== cf.id), viewSel: 'all', calMonth: null });
+        else { this.setState({ confirm: null, ...buildDefaults() }); this.top(); }
+      },
+
+      layoutOpts: [['1a', '단계별', 'steps'], ['1b', '한 페이지', 'single']].map(([id, label, v]) => ({ id, label, pick: () => this.setState({ layout: v }),
+        bg: L === v ? '#ffffff' : 'transparent', fg: L === v ? '#1d1d1f' : '#ffffff' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

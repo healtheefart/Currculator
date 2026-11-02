@@ -1,0 +1,8 @@
+:root{
+--shadow-product:rgba(0,0,0,0.22) 3px 5px 30px 0;
+--border-soft:1px solid rgba(0,0,0,0.08);
+--blur-frosted:saturate(180%) blur(20px);
+--ease-standard:cubic-bezier(0.25,0.1,0.25,1);
+--duration-press:200ms;
+--press-scale:0.95;
+}

@@ -1,0 +1,16 @@
+{
+  "project": "Currculator",
+  "phase": "0-mvp",
+  "steps": [
+    { "step": 0, "name": "project-setup", "status": "pending" },
+    { "step": 1, "name": "core-types", "status": "pending" },
+    { "step": 2, "name": "planner", "status": "pending" },
+    { "step": 3, "name": "inflearn-extractor", "status": "pending" },
+    { "step": 4, "name": "extract-api", "status": "pending" },
+    { "step": 5, "name": "app-state", "status": "pending" },
+    { "step": 6, "name": "ui-kit", "status": "pending" },
+    { "step": 7, "name": "build-steps", "status": "pending" },
+    { "step": 8, "name": "plan-views", "status": "pending" },
+    { "step": 9, "name": "app-flow", "status": "pending" }
+  ]
+}

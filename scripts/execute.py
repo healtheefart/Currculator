@@ -235,9 +235,11 @@ class StepExecutor:
             sys.exit(1)
 
         prompt = preamble + step_file.read_text()
+        # prompt는 stdin으로 전달한다. argv로 넘기면 Windows 명령줄 한도(32,767자)를 넘을 수 있다.
         result = subprocess.run(
-            ["claude", "-p", "--dangerously-skip-permissions", "--output-format", "json", prompt],
-            cwd=self._root, capture_output=True, text=True, timeout=1800,
+            ["claude", "-p", "--dangerously-skip-permissions", "--output-format", "json"],
+            input=prompt, cwd=self._root, capture_output=True, text=True,
+            encoding="utf-8", timeout=1800,
         )
 
         if result.returncode != 0:

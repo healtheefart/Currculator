@@ -437,8 +437,23 @@ class TestInvokeClaude:
         assert "-p" in cmd
         assert "--dangerously-skip-permissions" in cmd
         assert "--output-format" in cmd
-        assert "PREAMBLE" in cmd[-1]
-        assert "UI를 구현하세요" in cmd[-1]
+        prompt = mock_run.call_args[1]["input"]
+        assert "PREAMBLE" in prompt
+        assert "UI를 구현하세요" in prompt
+
+    def test_prompt_passed_via_stdin_not_argv(self, executor):
+        # Windows 명령줄 길이 한도(32,767자)를 피하기 위해 prompt는 stdin으로 전달한다.
+        mock_result = MagicMock(returncode=0, stdout="{}", stderr="")
+        step = {"step": 2, "name": "ui"}
+        long_preamble = "가" * 40000
+
+        with patch("subprocess.run", return_value=mock_result) as mock_run:
+            executor._invoke_claude(step, long_preamble)
+
+        cmd = mock_run.call_args[0][0]
+        assert all(len(arg) < 1000 for arg in cmd)
+        assert long_preamble in mock_run.call_args[1]["input"]
+        assert mock_run.call_args[1]["encoding"] == "utf-8"
 
     def test_saves_output_json(self, executor):
         mock_result = MagicMock(returncode=0, stdout='{"ok": true}', stderr="")
