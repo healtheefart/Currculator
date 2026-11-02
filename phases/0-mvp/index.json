@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "core-types",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-03T06:42:17+0900",
+      "completed_at": "2026-11-03T06:43:30+0900",
+      "summary": "src/types/curriculum.ts(CurriculumItem·Curriculum·ExtractErrorCode·ClientErrorCode·ExtractResponse)와 src/types/plan.ts(IsoDate·WeekdayMinutes·PlanSettings·PlanDay·Plan·PlanResult·PlanOverrides·AdjustedPlan·MergedPlan·SavedPlan) 타입 전용 정의"
     },
     {
       "step": 2,
