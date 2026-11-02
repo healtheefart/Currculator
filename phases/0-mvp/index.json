@@ -23,7 +23,7 @@
       "name": "planner",
       "status": "completed",
       "started_at": "2026-11-03T06:43:10+0900",
-      "completed_at": "2026-11-03T06:47:00+0900",
+      "completed_at": "2026-11-03T06:47:21+0900",
       "summary": "src/lib/date/kst.ts(KST 날짜·월 그리드, 정수 일수 산술), src/lib/format/(formatDuration·날짜 라벨), src/lib/planner/(effort·buildPlan 허용 오차 최근접 배분·applyOverrides·mergePlans·summarizeDays) 순수 함수와 테스트 57개"
     },
     {
