@@ -99,8 +99,7 @@ export default function Home() {
       <h1 className="cc-type-display-lg mb-7">계획확인</h1>
       {state.plans.length === 0 ? <section className="rounded-lg border border-hairline bg-canvas p-8 text-center"><p className="mb-5">아직 만든 계획이 없어요.</p><Button onClick={() => navigate("build")}>계획 짜기</Button></section> : <>
         <PlanPicker rows={[{ id: "all", title: "전체 보기", sub: `계획 ${state.plans.length}개` }, ...state.plans.map((plan) => ({ id: plan.id, title: plan.curriculum.title, sub: `수업 ${plan.curriculum.items.filter((item) => item.level === 1 && !item.excluded).length}개` }))]} selected={state.view.selected} onSelect={(selected) => dispatch({ type: "SELECT_PLAN", selected })} />
-        <div className="mt-6"><PlanSummary title={selectedPlan?.curriculum.title ?? "전체 계획"} planCount={selectedPlan ? undefined : state.plans.length} days={viewDays} /></div>
-        {selectedPlan && <div className="mt-5 flex flex-wrap justify-end gap-3"><Button variant="secondary" onClick={() => dispatch({ type: "START_EDIT", planId: selectedPlan.id })}>계획 수정</Button><Button variant="secondary" onClick={() => dispatch({ type: "ASK_DELETE", planId: selectedPlan.id })}>계획 삭제</Button></div>}
+        <div className="mt-6"><PlanSummary title={selectedPlan?.curriculum.title ?? "전체 계획"} planCount={selectedPlan ? undefined : state.plans.length} days={viewDays} onEdit={selectedPlan ? () => dispatch({ type: "START_EDIT", planId: selectedPlan.id }) : undefined} onDelete={selectedPlan ? () => dispatch({ type: "ASK_DELETE", planId: selectedPlan.id }) : undefined} /></div>
         <PlanViewTabs heading={selectedPlan ? "일정" : "날짜별 전체 일정"} tab={state.view.tab} onTab={(tab) => dispatch({ type: "SET_TAB", tab })}>{state.view.tab === "list" ? <PlanList days={viewDays} today={today} /> : <PlanCalendar days={viewDays} today={today} defaultMonth={defaultViewMonth} />}</PlanViewTabs>
       </>}
     </main>}
