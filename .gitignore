@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.vercel/
 out/
 next-env.d.ts
 tsconfig.tsbuildinfo
