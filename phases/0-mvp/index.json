@@ -2,15 +2,59 @@
   "project": "Currculator",
   "phase": "0-mvp",
   "steps": [
-    { "step": 0, "name": "project-setup", "status": "pending" },
-    { "step": 1, "name": "core-types", "status": "pending" },
-    { "step": 2, "name": "planner", "status": "pending" },
-    { "step": 3, "name": "inflearn-extractor", "status": "pending" },
-    { "step": 4, "name": "extract-api", "status": "pending" },
-    { "step": 5, "name": "app-state", "status": "pending" },
-    { "step": 6, "name": "ui-kit", "status": "pending" },
-    { "step": 7, "name": "build-steps", "status": "pending" },
-    { "step": 8, "name": "plan-views", "status": "pending" },
-    { "step": 9, "name": "app-flow", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "project-setup",
+      "status": "completed",
+      "started_at": "2026-11-03T06:38:39+0900",
+      "completed_at": "2026-11-03T06:42:00+0900",
+      "summary": "Next.js 16(App Router, TS strict, src/, @/*) + Tailwind v4(디자인 토큰 CSS 변수·@theme inline·cc-type-*/cc-press) + ESLint flat config + Vitest(jsdom, jest-dom) + Playwright(chromium, EXTRACT_FIXTURES=1) 구성, 임시 page.tsx와 page.test.tsx"
+    },
+    {
+      "step": 1,
+      "name": "core-types",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "planner",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "inflearn-extractor",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "extract-api",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "app-state",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "ui-kit",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "build-steps",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "plan-views",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "app-flow",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-11-03T06:38:39+0900"
 }
