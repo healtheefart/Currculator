@@ -55,7 +55,7 @@
       "name": "ui-kit",
       "status": "completed",
       "started_at": "2026-11-03T06:58:21+0900",
-      "completed_at": "2026-11-03T07:02:30+0900",
+      "completed_at": "2026-11-03T07:02:23+0900",
       "summary": "src/components/ui/(Button primary/secondary·disabled 시 cc-press 제거·type 기본 button·ref, OptionChip aria-pressed·detail, IconButton aria-label/title·size, TextLink <button>, Badge gray/dark/primary·sm/md, GlobalNav 주 메뉴 aria-current=page, StepBar sticky frosted blur·번호·past/current/upcoming·reachable 외 disabled·계획 수정 중 배지, ConfirmDialog role=dialog·aria-labelledby·확인 버튼 포커스·Esc/오버레이 취소, icons.tsx lucide-static 0.469.0 tarball에서 복사한 path 9종) + 컴포넌트 테스트 9파일"
     },
     {
