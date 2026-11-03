@@ -75,6 +75,52 @@ describe("POST /api/extract (EXTRACT_FIXTURES=1)", () => {
     expect(json).toEqual({ ok: false, code: "UNSUPPORTED" });
   });
 
+  it("패스트캠퍼스 fixture URL → 200, platform fastcampus", async () => {
+    const { status, json } = await call(
+      JSON.stringify({ url: "https://fastcampus.co.kr/biz_online_claude" }),
+    );
+    expect(status).toBe(200);
+    expect(json.ok).toBe(true);
+    if (!json.ok) return;
+    expect(json.curriculum.platform).toBe("fastcampus");
+  });
+
+  it("메가스터디 /chr/ URL은 정규화되어 200, 강의명 확인", async () => {
+    const { status, json } = await call(
+      JSON.stringify({ url: "https://megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549" }),
+    );
+    expect(status).toBe(200);
+    expect(json.ok).toBe(true);
+    if (!json.ok) return;
+    expect(json.curriculum.platform).toBe("megastudy");
+    expect(json.curriculum.title).toBe("중국어 어휘 폭풍성장");
+  });
+
+  it("E2 youtube.com을 접미사로 가진 다른 호스트 → UNSUPPORTED 422", async () => {
+    const { status, json } = await call(
+      JSON.stringify({ url: "https://youtube.com.evil.com/playlist?list=x" }),
+    );
+    expect(status).toBe(422);
+    expect(json).toEqual({ ok: false, code: "UNSUPPORTED" });
+  });
+
+  it("YouTube도 fixture fetch를 받아 외부에 요청하지 않는다 (fixture 없음 → 404)", async () => {
+    const realFetch = vi.fn(async () => {
+      throw new Error("network must not be used");
+    });
+    vi.stubGlobal("fetch", realFetch);
+    try {
+      const { status, json } = await call(
+        JSON.stringify({ url: "https://www.youtube.com/playlist?list=PLabc" }),
+      );
+      expect(realFetch).not.toHaveBeenCalled();
+      expect(status).toBe(404);
+      expect(json).toEqual({ ok: false, code: "NOT_FOUND" });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("E3 fixture 없는 slug → NOT_FOUND 404", async () => {
     const { status, json } = await call(
       JSON.stringify({ url: "https://www.inflearn.com/course/no-such-course" }),

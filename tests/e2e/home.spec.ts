@@ -22,9 +22,9 @@ test("rejects unsupported sites", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");
   await page.getByRole("button", { name: /강의 커리큘럼/ }).click();
-  await page.getByRole("textbox", { name: "강의 URL" }).fill("https://www.udemy.com/course/x");
+  await page.getByRole("textbox", { name: "강의 또는 재생목록 URL" }).fill("https://www.udemy.com/course/x");
   await page.getByRole("button", { name: "목차 가져오기" }).click();
-  await expect(page.getByText("지금은 인프런 강의 페이지만 지원해요.")).toBeVisible();
+  await expect(page.getByText(/^지금은 .*지원해요\.$/)).toBeVisible();
 });
 
 test("mobile calendar has no horizontal overflow", async ({ page }) => {

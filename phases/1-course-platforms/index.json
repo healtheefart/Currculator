@@ -53,7 +53,9 @@
     {
       "step": 6,
       "name": "extract-api",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-11-03T17:28:59+0900",
+      "summary": "route.ts가 url.ts에서 export한 플랫폼별 호스트 배열(INFLEARN_SITE_HOSTS·YOUTUBE_HOSTS·FASTCAMPUS_HOSTS·MEGASTUDY_HOSTS) 정확 일치 if 분기로 추출기를 고르고(그 밖 호스트는 요청 없이 422, endsWith 분기 제거) 모든 추출기에 pickFetch() 전달, createFixtureFetch(tests/fixtures)가 hostname으로 inflearn/fastcampus/megastudy(CHR_CD) 폴더를 골라 바이트 그대로(메가스터디 charset euc-kr) 응답, YouTube·기타 404 — 테스트 선작성(route 4개·fixture-fetch 재작성), 기존 E2E 선택자를 현재 UI 문구에 맞춤, lint·typecheck·581 tests·build·E2E 3개 통과"
     },
     {
       "step": 7,

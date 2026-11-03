@@ -13,17 +13,23 @@ export const ALLOWED_HOSTS: readonly string[] = [
   "megastudy.net",
 ];
 
+/** 인프런 강의 페이지 호스트(강의 경로 검사용) */
 const INFLEARN_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com"];
+
+/** 인프런 추출기가 맡는 호스트(단축 링크 inf.run 포함) */
+export const INFLEARN_SITE_HOSTS: readonly string[] = [...INFLEARN_HOSTS, "inf.run"];
 
 /** `/course/{slug}` 또는 `/{2글자 locale}/course/{slug}` (끝 슬래시 허용) */
 const COURSE_PATH = /^\/(?:[a-z]{2}\/)?course\/[^/]+\/?$/;
 
-const FASTCAMPUS_HOSTS: readonly string[] = ["fastcampus.co.kr", "www.fastcampus.co.kr"];
+export const FASTCAMPUS_HOSTS: readonly string[] = ["fastcampus.co.kr", "www.fastcampus.co.kr"];
 
 /** 패스트캠퍼스 강의 경로: 한 단계 `/{slug}` (끝 슬래시 허용) */
 const FASTCAMPUS_PATH = /^\/[A-Za-z0-9_-]+\/?$/;
 
 const MEGASTUDY_HOST = "www.megastudy.net";
+/** 메가스터디 추출기가 맡는 호스트(megastudy.net은 정규화에서 www로 바뀐다) */
+export const MEGASTUDY_HOSTS: readonly string[] = [MEGASTUDY_HOST];
 const MEGASTUDY_SHORT_PATH = "/chr/lecture_detailview.asp";
 const MEGASTUDY_COURSE_PATH = "/teacher_v2/chr/lecture_detailview.asp";
 
@@ -65,7 +71,7 @@ export function isInflearnCoursePath(url: URL): boolean {
   return INFLEARN_HOSTS.includes(url.hostname) && COURSE_PATH.test(url.pathname);
 }
 
-const YOUTUBE_HOSTS: readonly string[] = ["www.youtube.com", "youtube.com", "m.youtube.com", "music.youtube.com"];
+export const YOUTUBE_HOSTS: readonly string[] = ["www.youtube.com", "youtube.com", "m.youtube.com", "music.youtube.com"];
 
 export function isYouTubePlaylistUrl(url: URL): boolean {
   const id = url.searchParams.get("list") ?? "";

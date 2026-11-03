@@ -1,9 +1,18 @@
 import { join } from "node:path";
 import { ExtractError } from "@/services/extract/errors";
 import { createFixtureFetch } from "@/services/extract/fixture-fetch";
+import { fetchFastcampusCurriculum } from "@/services/extract/fastcampus";
 import { fetchInflearnCurriculum } from "@/services/extract/inflearn";
+import { fetchMegastudyCurriculum } from "@/services/extract/megastudy";
+import {
+  FASTCAMPUS_HOSTS,
+  INFLEARN_SITE_HOSTS,
+  MEGASTUDY_HOSTS,
+  YOUTUBE_HOSTS,
+  normalizeInputUrl,
+} from "@/services/extract/url";
 import { fetchYouTubePlaylist } from "@/services/extract/youtube";
-import { normalizeInputUrl } from "@/services/extract/url";
+import type { Curriculum } from "@/types/curriculum";
 import type { ExtractErrorCode, ExtractResponse } from "@/types/curriculum";
 
 export const runtime = "nodejs";
@@ -26,9 +35,19 @@ function fail(code: ExtractErrorCode): Response {
 
 function pickFetch(): typeof fetch {
   if (process.env.EXTRACT_FIXTURES === "1") {
-    return createFixtureFetch(join(process.cwd(), "tests", "fixtures", "inflearn"));
+    return createFixtureFetch(join(process.cwd(), "tests", "fixtures"));
   }
   return fetch;
+}
+
+/** hostname 정확 일치로 추출기를 고른다. 맡는 플랫폼이 없으면 null(요청하지 않음). */
+function extract(url: URL, fetchImpl: typeof fetch): Promise<Curriculum> | null {
+  const host = url.hostname;
+  if (INFLEARN_SITE_HOSTS.includes(host)) return fetchInflearnCurriculum(url, fetchImpl);
+  if (YOUTUBE_HOSTS.includes(host)) return fetchYouTubePlaylist(url, fetchImpl);
+  if (FASTCAMPUS_HOSTS.includes(host)) return fetchFastcampusCurriculum(url, fetchImpl);
+  if (MEGASTUDY_HOSTS.includes(host)) return fetchMegastudyCurriculum(url, fetchImpl);
+  return null;
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -46,9 +65,9 @@ export async function POST(request: Request): Promise<Response> {
   if (url === null) return fail("INVALID_URL");
 
   try {
-    const curriculum = url.hostname.endsWith("youtube.com")
-      ? await fetchYouTubePlaylist(url, fetch)
-      : await fetchInflearnCurriculum(url, pickFetch());
+    const pending = extract(url, pickFetch());
+    if (pending === null) return fail("UNSUPPORTED");
+    const curriculum = await pending;
     return respond({ ok: true, curriculum }, 200);
   } catch (err) {
     // 상세(원인·stack)는 서버 로그에만 남기고 응답에는 code만 넣는다
