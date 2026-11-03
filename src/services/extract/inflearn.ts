@@ -13,6 +13,13 @@ const INFO_KEY = /\/course\/\d+\/online\/info/;
 const NEXT_DATA_SCRIPT = /<script\b[^>]*\bid=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i;
 const DEFAULT_TITLE = "제목 없는 강의";
 
+/** Inflearn selects localized course data from the path, even when the request prefers Korean. */
+function koreanCourseUrl(url: URL): URL {
+  const localized = new URL(url.href);
+  localized.pathname = localized.pathname.replace(/^\/[a-z]{2}(?=\/course\/)/, "");
+  return localized;
+}
+
 // ───────────── 요청 ─────────────
 
 /** 요청해도 되는 URL인가: 허용 호스트 + (인프런 호스트면) 강의 경로. inf.run은 단축 링크 경로를 허용한다. */
@@ -42,7 +49,7 @@ export async function fetchInflearnCurriculum(
     signal,
   };
 
-  let current = url;
+  let current = koreanCourseUrl(url);
   const visited = new Set<string>([current.href]);
   let redirects = 0;
 
@@ -62,6 +69,7 @@ export async function fetchInflearnCurriculum(
           throw new ExtractError("FETCH_FAILED", "invalid Location");
         }
         if (!isRequestable(next)) throw new ExtractError("UNSUPPORTED");
+        next = koreanCourseUrl(next);
         if (visited.has(next.href)) throw new ExtractError("FETCH_FAILED", "redirect loop");
         visited.add(next.href);
         redirects += 1;

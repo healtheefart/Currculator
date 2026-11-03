@@ -15,5 +15,6 @@ export default defineConfig([
     "coverage/**",
     "blob-report/**",
     "docs/**",
+    "tmp/**",
   ]),
 ]);
