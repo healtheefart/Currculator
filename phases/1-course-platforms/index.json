@@ -47,7 +47,8 @@
       "name": "megastudy-extractor",
       "status": "completed",
       "started_at": "2026-11-03T17:26:36+0900",
-      "summary": "src/services/extract/megastudy.ts에 parseMegastudyHtml(강의목차 제목 바로 뒤 tb_char_opt 표의 tbody 행: 첫 td=수업명(태그 제거·공백 정리·엔티티 디코딩, 빈 행 버림), 마지막 lecture-time td=시간(MM:SS/H:MM:SS, -·빈 값·0 null), 강의명 가상 섹션 megastudy:{code}, 수업 id megastudy:{code}:{순번}, 강사 [..]·선생님 제거, 표 없음+'| 404' NOT_FOUND·그 외/0행 NO_CURRICULUM)와 fetchPage(euc-kr) 기반 fetchMegastudyCurriculum(CHR_CD 없으면 요청 없이 UNSUPPORTED) 추가 — 테스트 선작성 15개(fixture 21수업·61,863초), lint·typecheck·571 tests 통과"
+      "summary": "src/services/extract/megastudy.ts에 parseMegastudyHtml(강의목차 제목 바로 뒤 tb_char_opt 표의 tbody 행: 첫 td=수업명(태그 제거·공백 정리·엔티티 디코딩, 빈 행 버림), 마지막 lecture-time td=시간(MM:SS/H:MM:SS, -·빈 값·0 null), 강의명 가상 섹션 megastudy:{code}, 수업 id megastudy:{code}:{순번}, 강사 [..]·선생님 제거, 표 없음+'| 404' NOT_FOUND·그 외/0행 NO_CURRICULUM)와 fetchPage(euc-kr) 기반 fetchMegastudyCurriculum(CHR_CD 없으면 요청 없이 UNSUPPORTED) 추가 — 테스트 선작성 15개(fixture 21수업·61,863초), lint·typecheck·571 tests 통과",
+      "completed_at": "2026-11-03T17:28:58+0900"
     },
     {
       "step": 6,
