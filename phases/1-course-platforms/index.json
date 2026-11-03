@@ -32,7 +32,7 @@
       "status": "completed",
       "started_at": "2026-11-03T17:21:14+0900",
       "summary": "src/services/extract/fetch-page.ts에 fetchPage 추가(첫 URL·리다이렉트 대상마다 isRequestable 사전 검사, 공유 30초 signal, redirect: manual, Location 누락·잘못된 URL·루프·5회 초과 FETCH_FAILED, 404 NOT_FOUND, arrayBuffer+TextDecoder로 utf-8/euc-kr 디코딩, inflearn.ts 상수 재사용) — 테스트 선작성 22개, lint·typecheck·534 tests 통과",
-      "completed_at": "2026-11-03T17:24:00+0900"
+      "completed_at": "2026-11-03T17:23:20+0900"
     },
     {
       "step": 4,
