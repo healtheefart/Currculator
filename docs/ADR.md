@@ -70,12 +70,21 @@ MVP 속도 최우선. 외부 의존성 최소화. 작동하는 최소 구현을 
 **이유**: 자동 배분 규칙(ADR-005)과 `buildPlan` 시그니처를 바꾸지 않고, 설정을 바꿔도 사용자가 고정한 날짜는 유지된다. "자동 배분으로 되돌리기"는 overrides를 비우기만 하면 된다.
 **트레이드오프**: 설정을 크게 바꾸면 옮긴 수업이 자동 배분된 날과 겹쳐 그날이 범위 밖이 될 수 있다. 경고 배지로 보여 주고 사용자가 다시 조정한다.
 
-### ADR-015: 강의당 계획 1개 (인프런 강의 id)
-**결정**: `Curriculum.courseId`(인프런 curriculum 쿼리 키의 숫자 id)를 저장하고, 같은 courseId의 계획이 이미 있으면 새 계획을 만들지 않고 `ALREADY_PLANNED` 안내와 "계획확인에서 보기" 링크를 보인다. 제출 전에는 URL의 `cid` 파라미터로 먼저 확인해 불필요한 요청을 줄인다.
+### ADR-015: 강의당 계획 1개 (플랫폼별 강의 id)
+**결정**: `Curriculum.courseId`(플랫폼별 강의 id. 인프런은 curriculum 쿼리 키의 숫자, 그 밖의 플랫폼은 ADR-016의 `{플랫폼}:{id}` 형식)를 저장하고, 같은 courseId의 계획이 이미 있으면 새 계획을 만들지 않고 `ALREADY_PLANNED` 안내와 "계획확인에서 보기" 링크를 보인다. 제출 전에는 URL에서 강의 id를 알 수 있으면(인프런 `cid`, YouTube `list`, 메가스터디 `CHR_CD`) 먼저 확인해 불필요한 요청을 줄인다. 패스트캠퍼스는 URL에 강의 id가 없으므로 추출 후에만 확인한다.
 **이유**: 같은 강의의 계획이 여러 개면 전체 계획 보기에서 같은 수업이 겹친다. URL은 slug·cid·단축 링크 등 여러 형태라 URL 문자열보다 강의 id가 정확하다.
 **트레이드오프**: 같은 강의를 다른 속도로 두 번 계획할 수 없다. 기존 계획을 수정해야 한다.
 
-### ADR-011: 서버 fetch는 허용 호스트만
-**결정**: `www.inflearn.com`, `inflearn.com`, `inf.run`만 요청한다. `URL` 파싱 결과의 hostname을 정확히 일치로 비교하고 `https:`만 허용한다. `redirect: "manual"`로 응답을 받고 각 Location을 다음 요청 전에 검사한다. 인프런 호스트는 강의 경로(`/course/` 또는 locale 경로)만 요청한다. 리다이렉트는 최대 5회, 전체 요청은 30초로 제한한다. User-Agent는 일반 브라우저 UA 상수를 쓴다.
+### ADR-011: 서버 fetch는 허용 호스트만 (2026-11-03 개정)
+**결정**: 인프런(`www.inflearn.com`, `inflearn.com`, `inf.run`), YouTube(`www.youtube.com`, `youtube.com`, `m.youtube.com`, `music.youtube.com`), 패스트캠퍼스(`fastcampus.co.kr`, `www.fastcampus.co.kr`), 메가스터디(`www.megastudy.net`, `megastudy.net`)만 요청한다. `URL` 파싱 결과의 hostname을 이 목록과 정확히 일치로 비교하고 `https:`만 허용한다. `redirect: "manual"`로 응답을 받고 각 Location을 다음 요청 전에 검사한다. 경로는 플랫폼별로 제한한다: 인프런은 강의 경로(`/course/` 또는 locale 경로), YouTube는 `/playlist?list=`, 패스트캠퍼스는 한 단계 경로 `/{slug}`, 메가스터디는 `/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. 리다이렉트는 최대 5회, 전체 요청은 30초로 제한한다. User-Agent는 일반 브라우저 UA 상수를 쓴다. (이전 결정: 인프런 호스트 3개만)
 **이유**: 서버가 사용자 입력 URL을 가져오므로 임의 호스트 요청(SSRF)을 막는 최소한의 안전장치다.
 **트레이드오프**: 응답 크기 상한은 생략했다(배포 전 프로토타입). 배포 phase에서 IP 단위 요청 제한과 함께 다시 검토한다.
+
+### ADR-016: 패스트캠퍼스·메가스터디 추가, 플랫폼별 추출기 + 공통 안전 요청
+**결정**: 플랫폼마다 추출기 파일(`inflearn.ts`, `youtube.ts`, `fastcampus.ts`, `megastudy.ts`)을 두고, API 라우트가 입력 URL의 hostname을 정확히 일치로 비교해 추출기를 고른다. 공통 인터페이스·registry는 만들지 않고, 허용 호스트·경로 검사, 수동 리다이렉트(최대 5회), 30초 타임아웃, UA를 묶은 안전한 요청만 `fetch-page.ts`로 공유한다.
+- 패스트캠퍼스(`https://fastcampus.co.kr/{slug}`): HTML 안의 `self.__next_f.push([1,"..."])` 문자열 조각(RSC payload)을 이어 붙여 `"curriculum":[...]`를 읽는다. 구조는 PART → CHAPTER → CLIP이다. CHAPTER를 섹션으로 쓰고 제목은 `{Part 제목} · {Chapter 제목}`으로 붙인다. CLIP은 수업이고 `isAppendix`인 CLIP도 포함한다. 재생시간은 CLIP의 `time`(`00:11:44`)을 초로 바꾼다. curriculum이 없으면 `NO_CURRICULUM`.
+- 메가스터디(`https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`): 서버가 만든 EUC-KR HTML을 EUC-KR로 디코딩한다. `<p class="lstedu--subbx_tit">강의목차</p>` 바로 뒤의 `tb_char_opt` 표에서 행마다 첫 `<td>`를 수업명, 마지막 `<td class="lecture-time">`을 재생시간으로 읽는다. 섹션이 없으므로 강의명으로 가상 섹션 1개를 만든다. OT 행도 수업으로 포함한다. `/chr/lecture_detailview.asp`는 HTTP 200으로 404 페이지를 돌려주므로 `/teacher_v2/chr/` 경로로 정규화해 요청한다.
+- `Curriculum.courseId`: 인프런은 숫자 그대로, YouTube는 `youtube:{list}`, 패스트캠퍼스는 `fastcampus:{courseId}`(RSC payload의 `"courseId"`), 메가스터디는 `megastudy:{CHR_CD}`.
+- 유데미는 Cloudflare 봇 차단으로 서버 요청이 막히고, 에듀윌은 공개 페이지에 수업 목차가 없어 이번 phase에서 지원하지 않는다(2026-11-03 확인).
+**이유**: 2026-11-03 실제 페이지를 확인한 결과 두 사이트 모두 요청 1회로 목차와 재생시간을 얻을 수 있고, robots.txt가 해당 경로를 막지 않는다. 플랫폼이 여럿이 되면서 SSRF 방지 요청 코드를 추출기마다 복사하면 검사가 어긋날 위험이 커지므로 요청 부분만 공유한다. 파싱 방식이 플랫폼마다 완전히 달라 공통 인터페이스는 이점이 적다.
+**트레이드오프**: 두 사이트의 페이지 구조가 바뀌면 깨진다. fixture 테스트로 파싱 계약을 고정하고 수동 확인으로 감지한다. 패스트캠퍼스는 강의 URL이 한 단계 경로라서 URL만으로 강의 페이지인지 판별할 수 없다. 강의가 아닌 페이지는 요청한 뒤 `NO_CURRICULUM`으로 처리한다.

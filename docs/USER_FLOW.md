@@ -26,20 +26,24 @@
 
 ## UC-02 URL로 목차 가져오기 (url 단계)
 - "학습 자료 다시 고르기" 링크(추출 중에는 숨김), 제목 "강의 URL만 넣으세요.", 설명 "목차를 가져와 날짜별 학습 계획으로 나눠 드립니다."
-- "강의 사이트" 칩: 인프런(선택됨) / Udemy·클래스101·패스트캠퍼스(부가 문구 "준비 중"). 준비 중 칩을 누르면 선택은 인프런에 그대로 두고 "{사이트} 강의는 준비 중이에요. 지금은 인프런만 지원해요." 표시.
-- 입력(placeholder `https://www.inflearn.com/course/...`) + "목차 가져오기" 버튼. Enter도 제출. 입력을 바꾸면 오류 문구가 사라진다.
+- "강의 사이트" 칩: 지원 사이트 인프런(기본 선택) / YouTube / 패스트캠퍼스 / 메가스터디, 준비 중 사이트 Udemy / 클래스101(부가 문구 "준비 중"). 준비 중 칩을 누르면 선택은 그대로 두고 "{사이트} 강의는 준비 중이에요." 표시.
+- 입력 + "목차 가져오기" 버튼. Enter도 제출. 입력을 바꾸면 오류 문구가 사라진다. placeholder는 선택한 사이트를 따른다: 인프런 `https://www.inflearn.com/course/...`, YouTube `https://www.youtube.com/playlist?list=...`, 패스트캠퍼스 `https://fastcampus.co.kr/...`, 메가스터디 `https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=...`.
 - "예시 강의로 해보기" 링크 → 입력에 `https://www.inflearn.com/course/introduction-to-clau?cid=344799`를 채운다(추출 중에는 숨김).
 - 추출 중: 입력·버튼 비활성, "강의 정보 가져오는 중…" + 경과 초(`3초`).
 - 성공: 목차 확인 단계로. 시작일은 오늘(KST)로 다시 맞춘다. 다른 설정은 유지한다.
-- 허용 입력: `?cid=` 있음 / cid 없는 slug(308 리다이렉트로 cid 붙음) / `/en/`·`/ja/`·`/vi/` 경로 / 해시·추적 파라미터 / `inf.run` 단축 링크(301) / `m.inflearn.com`(→ `www`) / scheme 없음(`https://` 보정) / 앞뒤 공백.
+- 허용 입력(공통: scheme 없음(`https://` 보정) / 앞뒤 공백 / 해시):
+  - 인프런: `?cid=` 있음 / cid 없는 slug(308 리다이렉트로 cid 붙음) / `/en/`·`/ja/`·`/vi/` 경로 / 추적 파라미터 / `inf.run` 단축 링크(301) / `m.inflearn.com`(→ `www`).
+  - YouTube: `/playlist?list={id}` (`www.`·`m.`·`music.` 호스트 포함).
+  - 패스트캠퍼스: `fastcampus.co.kr/{slug}`, `www.fastcampus.co.kr/{slug}` (`www.` 유무 모두 허용, 경로는 한 단계).
+  - 메가스터디: `www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. `/chr/lecture_detailview.asp` 경로는 `/teacher_v2/chr/`로 정규화하고, `megastudy.net`은 `www.megastudy.net`으로 바꾼다.
 - 예외:
   - E1 빈 값·URL 형식 아님 → `INVALID_URL` (클라이언트에서 판단, 서버 요청 없음)
-  - E2 허용 호스트가 아닌 사이트, 인프런의 `/course/`가 아닌 경로, `inf.run`이 강의가 아닌 곳으로 리다이렉트 → `UNSUPPORTED` (명백한 경우 클라이언트에서 먼저 판단)
+  - E2 허용 호스트가 아닌 사이트, 플랫폼별 허용 경로가 아닌 주소(인프런 `/course/` 아님, YouTube `/playlist?list=` 아님, 패스트캠퍼스 두 단계 이상 경로, 메가스터디 `CHR_CD` 숫자 없음), `inf.run`이 강의가 아닌 곳으로 리다이렉트 → `UNSUPPORTED` (명백한 경우 클라이언트에서 먼저 판단)
   - E3 HTTP 404 → `NOT_FOUND`
   - E4 네트워크 오류·403/429/5xx·30초 초과·리다이렉트 루프 → `FETCH_FAILED` (입력 URL 유지, 다시 제출 가능)
-  - E5 `__NEXT_DATA__`나 curriculum 쿼리가 없음, 영상 수업 0개 → `NO_CURRICULUM`
+  - E5 페이지에서 목차를 찾지 못함(인프런 `__NEXT_DATA__`·curriculum 쿼리 없음, 패스트캠퍼스 RSC payload에 curriculum 없음 — 강의가 아닌 페이지 포함, 메가스터디 강의목차 표 없음), 수업 0개 → `NO_CURRICULUM`
   - E6 요청 중 재제출 → 버튼 비활성·Enter 무시로 차단
-  - E7 이미 계획을 만든 강의 → `ALREADY_PLANNED` + "계획확인에서 보기" 링크(그 계획을 선택한 계획확인으로 이동). 제출 전에 URL의 `cid`가 저장한 계획의 `courseId`와 같으면 요청하지 않고 바로, 아니면 추출 후 `curriculum.courseId`로 다시 확인한다.
+  - E7 이미 계획을 만든 강의 → `ALREADY_PLANNED` + "계획확인에서 보기" 링크(그 계획을 선택한 계획확인으로 이동). 제출 전에 URL에서 알 수 있는 강의 id(인프런 `cid`, YouTube `youtube:{list}`, 메가스터디 `megastudy:{CHR_CD}`)가 저장한 계획의 `courseId`와 같으면 요청하지 않고 바로, 아니면 추출 후 `curriculum.courseId`로 다시 확인한다.
 
 ## UC-03 목차 확인 (edit 단계)
 - 머리: "인프런 · {강사명}"(강사명이 없으면 "인프런"), 강의명(h1), "계획에 넣을 수업 {N}개 · 재생 {합} · 예상 {합×배수}".
@@ -134,11 +138,11 @@
 ## 오류 문구
 | 코드 | 문구 |
 |---|---|
-| INVALID_URL | 링크 형식이 올바르지 않아요. 인프런 강의 페이지 주소를 붙여 넣어 주세요. |
-| UNSUPPORTED | 지금은 인프런 강의 페이지만 지원해요. |
-| NOT_FOUND | 강의를 찾을 수 없어요. 주소를 다시 확인해 주세요. |
-| FETCH_FAILED | 강의 정보를 가져오지 못했어요. 잠시 후 다시 시도해 주세요. |
-| NO_CURRICULUM | 이 페이지에서 커리큘럼을 찾지 못했어요. |
+| INVALID_URL | 링크 형식이 올바르지 않아요. 강의나 재생목록 주소를 붙여 넣어 주세요. |
+| UNSUPPORTED | 지금은 인프런·패스트캠퍼스·메가스터디 강의와 YouTube 재생목록만 지원해요. |
+| NOT_FOUND | 강의 또는 재생목록을 찾을 수 없어요. 주소를 다시 확인해 주세요. |
+| FETCH_FAILED | 강의 또는 재생목록 정보를 가져오지 못했어요. 잠시 후 다시 시도해 주세요. |
+| NO_CURRICULUM | 이 주소에서 커리큘럼을 찾지 못했어요. |
 | ALREADY_PLANNED | 이미 계획을 만든 강의예요. 강의 하나에는 계획 하나만 만들 수 있어요. 기존 계획을 수정해 주세요. |
 
 | 계획 실패 | 문구 |

@@ -28,15 +28,22 @@ src/
 └── services/                     # 서버 전용 (클라이언트에서 import 금지)
     └── extract/
         ├── errors.ts             # ExtractError(code)
-        ├── url.ts                # 입력 URL 정규화, 허용 호스트 검사
+        ├── url.ts                # 입력 URL 정규화, 허용 호스트·플랫폼별 경로 검사
+        ├── fetch-page.ts         # 공통 안전 요청: 허용 호스트·경로 검사, 수동 리다이렉트 최대 5회, 30초 타임아웃, UA
         ├── inflearn.ts           # 인프런 페이지 요청 + __NEXT_DATA__ 파싱
+        ├── youtube.ts            # YouTube 재생목록 페이지 요청 + ytInitialData 파싱
+        ├── fastcampus.ts         # 패스트캠퍼스 페이지 요청 + RSC payload(self.__next_f) 파싱
+        ├── megastudy.ts          # 메가스터디 페이지 요청 + EUC-KR 디코딩 + 강의목차 표 파싱
         └── fixture-fetch.ts      # EXTRACT_FIXTURES=1용 가짜 fetch
 docs/design/                      # 프로토타입(prototype.dc.html)과 디자인 토큰 원본 — 참고용, 빌드에 쓰지 않음
 tests/
-├── fixtures/inflearn/            # 저장된 인프런 페이지 HTML
+├── fixtures/
+│   ├── inflearn/                 # 저장된 인프런 페이지 HTML
+│   ├── fastcampus/biz_online_claude.html  # 저장된 패스트캠퍼스 강의 페이지
+│   └── megastudy/54549.html      # 저장된 메가스터디 강의 페이지(EUC-KR 원본 바이트)
 └── e2e/                          # Playwright
 ```
-- 플랫폼이 인프런 하나뿐이므로 추출기 공통 인터페이스·registry는 두지 않는다. 두 번째 플랫폼이 붙을 때 만든다.
+- 플랫폼별 추출기 파일을 두고, 공통 인터페이스·registry는 만들지 않는다. 안전한 요청(리다이렉트 검사·타임아웃)만 `fetch-page.ts`로 공유한다(ADR-016).
 
 ## 패턴
 - 메인 화면은 상호작용이 많으므로 `page.tsx`를 Client Component로 만든다. `layout.tsx`는 Server Component.
@@ -47,11 +54,12 @@ tests/
 
 ## 데이터 흐름
 ```
-URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED), cid로 중복 확인(ALREADY_PLANNED)
+URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED), URL에서 알 수 있는 강의 id로 중복 확인(ALREADY_PLANNED)
   → POST /api/extract {url}
-      → url.ts: 정규화(trim, https 보정, m. → www, 해시 제거) + 허용 호스트·/course/ 경로 검사
-      → inflearn.ts: GET (일반 브라우저 UA, 전체 30초 타임아웃, 수동 리다이렉트 최대 5회, 각 대상 요청 전 호스트·경로 검사)
-      → __NEXT_DATA__ 파싱 → Curriculum
+      → url.ts: 정규화(trim, https 보정, m.inflearn → www, megastudy.net → www, 메가스터디 /chr/ → /teacher_v2/chr/, 해시 제거) + 허용 호스트·플랫폼별 경로 검사
+      → hostname 정확 일치로 플랫폼별 추출기 선택: inflearn.ts / youtube.ts / fastcampus.ts / megastudy.ts
+      → fetch-page.ts: GET (일반 브라우저 UA, 전체 30초 타임아웃, 수동 리다이렉트 최대 5회, 각 대상 요청 전 호스트·경로 검사)
+      → 플랫폼별 파싱(__NEXT_DATA__ / ytInitialData / RSC payload / EUC-KR 표) → Curriculum
   ← {ok:true, curriculum} | {ok:false, code}
   → courseId로 중복 재확인 → app-reducer EXTRACT_SUCCESS (draft = {curriculum, settings, overrides:{}})
   → 목차·설정·조정 편집 (draft-reducer)
@@ -69,9 +77,28 @@ URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED)
 - 강사명: 같은 online/info 항목의 `state.data.data.instructors[].name`을 `, `로 이음. 없으면 null.
 - 실측 fixture(introduction-to-clau, cid 344799): 섹션 4, unit 13(퀴즈 1), 영상 수업 12, runtime 합 6,385초, 강사 "Doo it".
 
+## 패스트캠퍼스 파싱
+- 강의 URL: `https://fastcampus.co.kr/{slug}`(예: `/biz_online_claude`, `www.` 유무 허용). 경로가 한 단계라 URL만으로 강의 페이지인지 판별할 수 없다. robots.txt는 `Allow: /`(2026-11-03 확인).
+- Next.js App Router 페이지다. HTML의 `self.__next_f.push([1,"..."])` 문자열 조각을 JSON 문자열로 디코딩해 순서대로 이어 붙인 RSC payload에서 `"curriculum":[...]` 배열을 괄호 짝을 맞춰 잘라 `JSON.parse`로 읽는다.
+- 구조: PART `{id, type:"PART", title, time, child[]}` → CHAPTER `{type:"CHAPTER", title, time, child[]}` → CLIP `{id, type:"CLIP", title, time:"00:11:44", isAppendix}`.
+- CHAPTER가 섹션(level 0)이고 제목은 `{Part 제목} · {Chapter 제목}`. CLIP이 수업(level 1)이며 `isAppendix`인 CLIP도 포함한다. `time`(`HH:MM:SS`)을 초로 바꾸고, 0이거나 형식이 틀리면 `durationSec: null`.
+- `courseId`: 같은 payload의 `"courseId":261444`(queryKey `getCourseById`) → `fastcampus:261444`.
+- curriculum이 없거나 CLIP이 0개면 `NO_CURRICULUM`.
+- 실측 fixture(biz_online_claude): courseId 261444, Part 7개, CHAPTER 16개, CLIP 51개(`isAppendix` 0개), CLIP `time` 합 43,726초(12시간 8분 46초).
+
+## 메가스터디 파싱
+- 강의 URL: `https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. `megastudy.net`은 `www.megastudy.net`으로, `/chr/lecture_detailview.asp`는 `/teacher_v2/chr/lecture_detailview.asp`로 정규화한다(`/chr/` 경로는 HTTP 200으로 본문에 `| 404`가 든 오류 페이지를 돌려준다). robots.txt는 이 경로를 막지 않는다(2026-11-03 확인).
+- 서버가 만든 HTML이고 EUC-KR 인코딩이다. 응답 바이트를 `TextDecoder("euc-kr")`로 디코딩한다.
+- `<p class="lstedu--subbx_tit">강의목차</p>` 바로 뒤의 `<table class="tb_char_opt">`(같은 class의 표가 여러 개 있고, `border` 등 다른 속성이 앞에 올 수 있다)의 `<tbody>` 각 `<tr>`에서 첫 `<td>`가 수업명, 마지막 `<td class="lecture-time">`이 재생시간(`56:25` 또는 `1:09:03`)이다. 가운데 `lecture-time` 칸(교재, `-`)은 쓰지 않는다.
+- 섹션이 없으므로 강의명으로 가상 섹션 1개(level 0)를 만들고 모든 행을 그 아래 수업으로 둔다. OT 행도 수업으로 포함한다.
+- 강의명: `<p class="lstedu_bookinfo--tit">`의 텍스트. 강사명: `<p class="lstedu_bookinfo--teacher">` 안 첫 링크 텍스트(`[제2외국어] 박수진 선생님`).
+- `courseId`: `megastudy:{CHR_CD}`.
+- 강의목차 표가 없거나 행이 0개면 `NO_CURRICULUM`.
+- 실측 fixture(54549): CHR_CD 54549, 강의명 "중국어 어휘 폭풍성장", 표 행 21개(OT + 1~20강), 재생시간 합 61,863초(17시간 11분 3초).
+
 ## 데이터 모델 (정확한 정의는 `src/types/`)
 - `CurriculumItem`: `id`(인프런 id 문자열), `title`, `level`(0 섹션 / 1 수업), `order`, `sectionId`(수업이면 소속 섹션 id, 섹션이면 null), `durationSec`(number | null), `source`(`"origin"` | `"manual"`), `excluded`(boolean)
-- `Curriculum`: `title`, `sourceUrl`, `platform`(`"inflearn"`), `courseId`(문자열), `instructor`(string | null), `droppedCount`, `items`(평평한 목록)
+- `Curriculum`: `title`, `sourceUrl`, `platform`(`"inflearn"` | `"youtube"` | `"book"` | `"fastcampus"` | `"megastudy"`), `courseId`(문자열: 인프런 숫자, `youtube:{list}`, `fastcampus:{courseId}`, `megastudy:{CHR_CD}`), `instructor`(string | null), `droppedCount`, `items`(평평한 목록)
 - `PlanSettings`: `startDate`, `weekdayMinutes`(길이 7, 인덱스 0 = 일요일), `toleranceMinutes`, `restDates`, `lectureMultiplier`
 - `PlanDay` / `Plan` / `PlanResult`: 자동 배분 결과(`buildPlan`)
 - `PlanOverrides`: `Record<수업 id, IsoDate | null>` (날짜 = 직접 옮김, null = 계획에서 제외)
@@ -87,4 +114,4 @@ URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED)
 - `draft-reducer`: `PlanDraft = {curriculum, settings, overrides}`의 편집(제목·시간·제외, 설정, 옮기기·제외·되돌리기). `app-reducer`가 `DRAFT` 액션으로 위임한다.
 - 배분 결과는 `useMemo`로 계산한 파생값이며 state·저장본에 넣지 않는다.
 - 영속화: `lib/storage/plans.ts`가 `currculator:plans:v1`에 `{version:1, plans}`를 저장한다. `page.tsx`가 마운트 후 `loadPlans()`로 한 번 읽고, plans가 사용자 동작(계획하기·저장·삭제)으로 바뀐 경우에만 `savePlans`를 호출한다.
-- 테스트: `EXTRACT_FIXTURES=1`이면 API 라우트가 네트워크 대신 `tests/fixtures/inflearn/{slug}.html`을 읽는다(E2E용).
+- 테스트: `EXTRACT_FIXTURES=1`이면 API 라우트가 네트워크 대신 플랫폼별 `tests/fixtures/{platform}/` 폴더를 읽는다(E2E용. 예: `inflearn/{slug}.html`, `fastcampus/{slug}.html`, `megastudy/{CHR_CD}.html`).
