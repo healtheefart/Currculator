@@ -39,7 +39,8 @@
       "name": "fastcampus-extractor",
       "status": "completed",
       "started_at": "2026-11-03T17:23:20+0900",
-      "summary": "src/services/extract/fastcampus.ts에 parseFastcampusHtml(self.__next_f 조각 JSON.parse 연결 → \"curriculum\":[ 괄호 짝 추출, CHAPTER=섹션 'Part · Chapter'·PART 직속 CLIP은 PART 섹션, CLIP=수업(H:MM:SS/MM:SS→초, 0·오류 null), courseId fastcampus:{getCourseById}, og:title→<title> 엔티티 디코딩·' | 패스트캠퍼스' 제거, instructor null)와 fetchPage 기반 fetchFastcampusCurriculum 추가 — 테스트 선작성 22개(fixture 16섹션·51수업·43,726초), lint·typecheck·556 tests 통과"
+      "summary": "src/services/extract/fastcampus.ts에 parseFastcampusHtml(self.__next_f 조각 JSON.parse 연결 → \"curriculum\":[ 괄호 짝 추출, CHAPTER=섹션 'Part · Chapter'·PART 직속 CLIP은 PART 섹션, CLIP=수업(H:MM:SS/MM:SS→초, 0·오류 null), courseId fastcampus:{getCourseById}, og:title→<title> 엔티티 디코딩·' | 패스트캠퍼스' 제거, instructor null)와 fetchPage 기반 fetchFastcampusCurriculum 추가 — 테스트 선작성 22개(fixture 16섹션·51수업·43,726초), lint·typecheck·556 tests 통과",
+      "completed_at": "2026-11-03T17:26:36+0900"
     },
     {
       "step": 5,
