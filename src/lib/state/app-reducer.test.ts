@@ -59,6 +59,7 @@ describe("createInitialState", () => {
       plansRevision: 0,
       build: {
         stage: "type",
+        site: "inflearn",
         url: "",
         extracting: false,
         errorCode: null,
@@ -74,8 +75,8 @@ describe("createInitialState", () => {
   });
 
   it("SITES 순서", () => {
-    expect(SITES.map((s) => s.label)).toEqual(["인프런", "Udemy", "클래스101", "패스트캠퍼스"]);
-    expect(SITES.map((s) => s.id)).toEqual(["inflearn", "udemy", "class101", "fastcampus"]);
+    expect(SITES.map((s) => s.label)).toEqual(["인프런", "YouTube", "Udemy", "클래스101", "패스트캠퍼스"]);
+    expect(SITES.map((s) => s.id)).toEqual(["inflearn", "youtube", "udemy", "class101", "fastcampus"]);
   });
 });
 
@@ -101,11 +102,11 @@ describe("INIT / NAVIGATE", () => {
 });
 
 describe("학습 자료·사이트 선택", () => {
-  it("PICK_SOURCE course → url, book → 안내만", () => {
+  it("PICK_SOURCE course → url, book → book 단계", () => {
     expect(reduce(initial, { type: "PICK_SOURCE", source: "course" }).build.stage).toBe("url");
     const book = reduce(initial, { type: "PICK_SOURCE", source: "book" });
-    expect(book.build.stage).toBe("type");
-    expect(book.build.bookNotice).toBe(true);
+    expect(book.build.stage).toBe("book");
+    expect(book.build.bookNotice).toBe(false);
   });
 
   it("PICK_SITE", () => {

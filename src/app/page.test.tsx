@@ -11,7 +11,7 @@ describe("home flow", () => {
   it("builds and persists a plan", async () => {
     render(<Home />);
     fireEvent.click(await screen.findByRole("button", { name: /강의 커리큘럼/ }));
-    fireEvent.change(screen.getByRole("textbox", { name: "강의 URL" }), { target: { value: "https://www.inflearn.com/course/test?cid=123" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "강의 또는 재생목록 URL" }), { target: { value: "https://www.inflearn.com/course/test?cid=123" } });
     fireEvent.click(screen.getByRole("button", { name: "목차 가져오기" }));
     expect(await screen.findByText("테스트 강의")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "다음: 일정 설정" }));

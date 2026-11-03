@@ -29,9 +29,9 @@ function setup(overrides: Partial<Props> = {}) {
 describe("UrlStep (UC-02)", () => {
   it("제목·설명·입력·버튼을 보인다", () => {
     setup();
-    expect(screen.getByRole("heading", { level: 1, name: "강의 URL만 넣으세요." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "강의 또는 재생목록 URL을 넣어 주세요." })).toBeInTheDocument();
     expect(screen.getByText("목차를 가져와 날짜별 학습 계획으로 나눠 드립니다.")).toBeInTheDocument();
-    const input = screen.getByRole("textbox", { name: "강의 URL" });
+    const input = screen.getByRole("textbox", { name: "강의 또는 재생목록 URL" });
     expect(input).toHaveAttribute("type", "text");
     expect(input).toHaveAttribute("inputMode", "url");
     expect(input).toHaveAttribute("placeholder", "https://www.inflearn.com/course/...");
@@ -57,7 +57,7 @@ describe("UrlStep (UC-02)", () => {
 
   it("입력하면 onUrlChange, 버튼·Enter면 onSubmit", async () => {
     const props = setup();
-    const input = screen.getByRole("textbox", { name: "강의 URL" });
+    const input = screen.getByRole("textbox", { name: "강의 또는 재생목록 URL" });
     await userEvent.type(input, "a");
     expect(props.onUrlChange).toHaveBeenCalledWith("a");
     await userEvent.click(screen.getByRole("button", { name: "목차 가져오기" }));
@@ -76,7 +76,7 @@ describe("UrlStep (UC-02)", () => {
 
   it("추출 중이면 입력·버튼 비활성, 링크 숨김, 경과 초 표시 (E6)", async () => {
     const props = setup({ extracting: true, elapsedSec: 3, url: "https://www.inflearn.com/course/x" });
-    const input = screen.getByRole("textbox", { name: "강의 URL" });
+    const input = screen.getByRole("textbox", { name: "강의 또는 재생목록 URL" });
     expect(input).toBeDisabled();
     expect(screen.getByRole("button", { name: "목차 가져오기" })).toBeDisabled();
     expect(screen.queryByRole("button", { name: "학습 자료 다시 고르기" })).not.toBeInTheDocument();
@@ -96,7 +96,7 @@ describe("UrlStep (UC-02)", () => {
   it("errorCode면 role=alert 문구 (E1)", () => {
     setup({ errorCode: "INVALID_URL" });
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "링크 형식이 올바르지 않아요. 인프런 강의 페이지 주소를 붙여 넣어 주세요.",
+      "링크 형식이 올바르지 않아요. 인프런 강의나 YouTube 재생목록 주소를 붙여 넣어 주세요.",
     );
     expect(screen.queryByRole("button", { name: "계획확인에서 보기" })).not.toBeInTheDocument();
   });

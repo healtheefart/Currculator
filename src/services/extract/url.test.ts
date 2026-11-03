@@ -11,8 +11,16 @@ function accepted(raw: string): boolean {
 }
 
 describe("ALLOWED_HOSTS", () => {
-  it("인프런 호스트 3개만 담는다", () => {
-    expect([...ALLOWED_HOSTS].sort()).toEqual(["inf.run", "inflearn.com", "www.inflearn.com"]);
+  it("인프런 호스트 3개와 YouTube 호스트 4개만 담는다", () => {
+    expect([...ALLOWED_HOSTS].sort()).toEqual([
+      "inf.run",
+      "inflearn.com",
+      "m.youtube.com",
+      "music.youtube.com",
+      "www.inflearn.com",
+      "www.youtube.com",
+      "youtube.com",
+    ]);
   });
 });
 
