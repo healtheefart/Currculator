@@ -63,6 +63,34 @@ describe("CurriculumEditor (UC-03)", () => {
     expect(screen.queryByText(/인프런 ·/)).not.toBeInTheDocument();
   });
 
+  it.each([
+    ["youtube", "YouTube"],
+    ["fastcampus", "패스트캠퍼스"],
+    ["megastudy", "메가스터디"],
+  ] as const)("머리 플랫폼 이름: %s → %s", (platform, label) => {
+    const { unmount } = render(
+      <CurriculumEditor curriculum={makeCurriculum({ platform })} multiplier={1.5} onAction={() => {}} />,
+    );
+    expect(screen.getByText(`${label} · Doo it`)).toBeInTheDocument();
+    unmount();
+    render(
+      <CurriculumEditor curriculum={makeCurriculum({ platform, instructor: null })} multiplier={1.5} onAction={() => {}} />,
+    );
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
+  it("책: 강사가 있으면 '책 · 저자', 없으면 '책 학습'", () => {
+    const { unmount } = render(
+      <CurriculumEditor curriculum={makeCurriculum({ platform: "book" })} multiplier={1.5} onAction={() => {}} />,
+    );
+    expect(screen.getByText("책 · Doo it")).toBeInTheDocument();
+    unmount();
+    render(
+      <CurriculumEditor curriculum={makeCurriculum({ platform: "book", instructor: null })} multiplier={1.5} onAction={() => {}} />,
+    );
+    expect(screen.getByText("책 학습")).toBeInTheDocument();
+  });
+
   it("안내 문구: 뺀 개수가 있으면 앞 문장 포함", () => {
     render(<CurriculumEditor curriculum={makeCurriculum()} multiplier={1.5} onAction={() => {}} />);
     expect(

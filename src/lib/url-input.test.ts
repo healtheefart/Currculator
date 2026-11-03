@@ -20,6 +20,15 @@ describe("checkCourseUrl", () => {
     "https://www.inflearn.com/ja/course/x",
     "https://www.inflearn.com/vi/course/x#curriculum",
     "http://www.inflearn.com/course/x",
+    "https://fastcampus.co.kr/dev_online_react",
+    "https://www.fastcampus.co.kr/dev_online_react",
+    "fastcampus.co.kr/dev_online_react/",
+    "https://www.fastcampus.co.kr/dev_online_react#curriculum",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12345",
+    "https://megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12345",
+    "https://www.megastudy.net/chr/lecture_detailview.asp?CHR_CD=12345",
+    "https://www.megastudy.net/Teacher_V2/CHR/Lecture_DetailView.asp?CHR_CD=12345",
+    "www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?tec_cd=a&CHR_CD=7",
   ])("허용: %s → null", (raw) => {
     expect(checkCourseUrl(raw)).toBeNull();
   });
@@ -42,7 +51,37 @@ describe("checkCourseUrl", () => {
     "https://www.inflearn.com/roadmaps/1",
     "https://www.inflearn.com/",
     "https://www.inflearn.com/fr/course/x",
+    "https://fastcampus.co.kr/",
+    "https://fastcampus.co.kr/category/dev",
+    "https://www.fastcampus.co.kr/a/b",
+    "https://fastcampus.co.kr.evil.com/x",
+    "https://evilfastcampus.co.kr/x",
+    "https://online.fastcampus.co.kr/x",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12a",
+    "https://www.megastudy.net/teacher_v2/chr/other.asp?CHR_CD=12345",
+    "https://www.megastudy.net/",
+    "https://megastudy.net.evil.com/teacher_v2/chr/lecture_detailview.asp?CHR_CD=1",
+    "https://mbest.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=1",
   ])("E2 %s → UNSUPPORTED", (raw) => {
+    expect(checkCourseUrl(raw)).toBe("UNSUPPORTED");
+  });
+});
+
+describe("checkCourseUrl: m. 접두", () => {
+  it("m.inflearn.com은 www로 바꿔 허용", () => {
+    expect(checkCourseUrl("https://m.inflearn.com/course/x")).toBeNull();
+  });
+
+  it("m.youtube.com 재생목록은 허용", () => {
+    expect(checkCourseUrl("https://m.youtube.com/playlist?list=PL123")).toBeNull();
+  });
+
+  it.each([
+    "https://m.fastcampus.co.kr/dev_online_react",
+    "https://m.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12345",
+  ])("새 호스트의 m.은 www로 바꾸지 않아 UNSUPPORTED: %s", (raw) => {
     expect(checkCourseUrl(raw)).toBe("UNSUPPORTED");
   });
 });
@@ -58,6 +97,21 @@ describe("cidFromUrl", () => {
     expect(cidFromUrl("https://www.inflearn.com/course/x?cid=abc")).toBeNull();
     expect(cidFromUrl("https://www.inflearn.com/course/x?cid=12a")).toBeNull();
     expect(cidFromUrl("https://www.inflearn.com/course/x?cid=")).toBeNull();
+  });
+
+  it("메가스터디면 megastudy:{CHR_CD}", () => {
+    expect(cidFromUrl("https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12345")).toBe(
+      "megastudy:12345",
+    );
+    expect(cidFromUrl("megastudy.net/chr/lecture_detailview.asp?CHR_CD=7")).toBe("megastudy:7");
+    expect(cidFromUrl("https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc")).toBeNull();
+    expect(cidFromUrl("https://www.megastudy.net/teacher_v2/chr/other.asp?CHR_CD=12345")).toBeNull();
+    expect(cidFromUrl("https://m.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12345")).toBeNull();
+  });
+
+  it("패스트캠퍼스는 URL에 강의 id가 없으므로 null", () => {
+    expect(cidFromUrl("https://fastcampus.co.kr/dev_online_react")).toBeNull();
+    expect(cidFromUrl("https://www.fastcampus.co.kr/dev_online_react?cid=12")).toBeNull();
   });
 
   it("URL이 아니면 null", () => {

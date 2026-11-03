@@ -34,7 +34,7 @@ export function SourceStep({ bookNotice, onPick }: SourceStepProps) {
         >
           <MonitorPlayIcon size={24} />
           <span className="cc-type-tagline mt-auto">강의 커리큘럼</span>
-          <span className="cc-type-caption text-text-secondary">인프런 강의나 YouTube 재생목록 URL로 목차를 가져와요.</span>
+          <span className="cc-type-caption text-text-secondary">온라인 강의 URL로 목차를 가져와요.</span>
         </button>
         <button
           type="button"

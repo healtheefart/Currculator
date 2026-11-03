@@ -5,8 +5,18 @@ import { Button } from "@/components/ui/Button";
 import { OptionChip } from "@/components/ui/OptionChip";
 import { TextLink } from "@/components/ui/TextLink";
 import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { SITES, type SiteId } from "@/lib/state/app-reducer";
+import { isSupportedSite, SITES, type SiteId } from "@/lib/state/app-reducer";
 import type { ClientErrorCode } from "@/types/curriculum";
+
+const PLACEHOLDERS: Record<SiteId, string> = {
+  inflearn: "https://www.inflearn.com/course/...",
+  youtube: "https://www.youtube.com/playlist?list=...",
+  fastcampus: "https://fastcampus.co.kr/...",
+  megastudy: "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=...",
+  // 준비 중 사이트는 선택되지 않지만 타입상 값을 둔다
+  udemy: "https://www.inflearn.com/course/...",
+  class101: "https://www.inflearn.com/course/...",
+};
 
 export interface UrlStepProps {
   url: string;
@@ -53,14 +63,14 @@ export function UrlStep(props: UrlStepProps) {
             <OptionChip
               key={s.id}
               label={s.label}
-              detail={s.id === "inflearn" || s.id === "youtube" ? undefined : "준비 중"}
+              detail={isSupportedSite(s.id) ? undefined : "준비 중"}
               selected={s.id === site}
               onClick={() => props.onPickSite(s.id)}
             />
           ))}
         </div>
         {noticeLabel ? (
-          <span className="cc-type-caption">{noticeLabel} 강의는 준비 중이에요. 지금은 인프런만 지원해요.</span>
+          <span className="cc-type-caption">{noticeLabel} 강의는 준비 중이에요.</span>
         ) : null}
       </div>
       <form onSubmit={handleSubmit} className="flex w-full max-w-[640px] flex-wrap justify-center gap-3">
@@ -71,7 +81,7 @@ export function UrlStep(props: UrlStepProps) {
           value={url}
           disabled={extracting}
           onChange={(e) => props.onUrlChange(e.target.value)}
-          placeholder={site === "youtube" ? "https://www.youtube.com/playlist?list=..." : "https://www.inflearn.com/course/..."}
+          placeholder={PLACEHOLDERS[site]}
           autoComplete="off"
           spellCheck={false}
           className="cc-type-body h-12 min-w-0 flex-[1_1_280px] rounded-full border border-solid border-hairline bg-canvas px-[22px] text-ink disabled:text-text-tertiary"

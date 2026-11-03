@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { formatDuration } from "@/lib/format/duration";
+import { PLATFORM_LABELS } from "@/lib/format/platform";
 import { effortSec } from "@/lib/planner/effort";
 import type { DraftAction } from "@/lib/state/draft-reducer";
 import { parseMinutes } from "@/lib/state/inputs";
@@ -140,7 +141,11 @@ export function CurriculumEditor({ curriculum, multiplier, onAction }: Curriculu
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <span className="cc-type-caption-strong text-text-tertiary">
-          {curriculum.instructor ? `${curriculum.platform === "youtube" ? "YouTube" : curriculum.platform === "book" ? "책" : "인프런"} · ${curriculum.instructor}` : curriculum.platform === "youtube" ? "YouTube" : curriculum.platform === "book" ? "책 학습" : "인프런"}
+          {curriculum.instructor
+            ? `${PLATFORM_LABELS[curriculum.platform]} · ${curriculum.instructor}`
+            : curriculum.platform === "book"
+              ? "책 학습"
+              : PLATFORM_LABELS[curriculum.platform]}
         </span>
         <h1 className="cc-type-display-lg m-0 text-balance" style={{ fontSize: "clamp(28px,4vw,40px)" }}>
           {curriculum.title}

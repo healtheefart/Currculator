@@ -8,7 +8,7 @@ describe("SourceStep (UC-01)", () => {
     expect(screen.getByRole("heading", { level: 1, name: "무엇으로 공부하나요?" })).toBeInTheDocument();
     expect(screen.getByText("목차를 가져올 학습 자료를 고르세요.")).toBeInTheDocument();
     const course = screen.getByRole("button", { name: /강의 커리큘럼/ });
-    expect(course).toHaveTextContent("인프런 강의나 YouTube 재생목록 URL로 목차를 가져와요.");
+    expect(course).toHaveTextContent("온라인 강의 URL로 목차를 가져와요.");
     const book = screen.getByRole("button", { name: /책 목차/ });
     expect(book).toHaveTextContent("책 제목이나 ISBN으로 목차와 페이지 정보를 찾아요.");
     expect(book).not.toHaveTextContent("준비 중");

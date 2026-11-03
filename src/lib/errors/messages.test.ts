@@ -9,10 +9,10 @@ describe("ERROR_MESSAGES", () => {
     Object.values(ERROR_MESSAGES).forEach((m) => expect(m.trim()).not.toBe(""));
   });
 
-  it("현재 오류 문구와 글자가 같다", () => {
+  it("USER_FLOW 오류 문구 표와 글자가 같다", () => {
     expect(ERROR_MESSAGES).toEqual({
-      INVALID_URL: "링크 형식이 올바르지 않아요. 인프런 강의나 YouTube 재생목록 주소를 붙여 넣어 주세요.",
-      UNSUPPORTED: "지금은 인프런 강의와 YouTube 재생목록만 지원해요.",
+      INVALID_URL: "링크 형식이 올바르지 않아요. 강의나 재생목록 주소를 붙여 넣어 주세요.",
+      UNSUPPORTED: "지금은 인프런·패스트캠퍼스·메가스터디 강의와 YouTube 재생목록만 지원해요.",
       NOT_FOUND: "강의 또는 재생목록을 찾을 수 없어요. 주소를 다시 확인해 주세요.",
       FETCH_FAILED: "강의 또는 재생목록 정보를 가져오지 못했어요. 잠시 후 다시 시도해 주세요.",
       NO_CURRICULUM: "이 주소에서 커리큘럼을 찾지 못했어요.",

@@ -38,10 +38,24 @@ describe("UrlStep (UC-02)", () => {
     expect(screen.getByRole("button", { name: "목차 가져오기" })).toBeEnabled();
   });
 
-  it("사이트 칩: 인프런 선택, 나머지는 준비 중", async () => {
+  it("사이트 칩: 인프런 선택, 지원 사이트는 부가 문구 없음, Udemy·클래스101은 준비 중", async () => {
     const props = setup();
+    const chips = screen.getAllByRole("button").filter((b) => b.hasAttribute("aria-pressed"));
+    expect(chips.map((b) => b.textContent)).toEqual([
+      "인프런",
+      "YouTube",
+      "패스트캠퍼스",
+      "메가스터디",
+      "Udemy준비 중",
+      "클래스101준비 중",
+    ]);
     expect(screen.getByRole("button", { name: "인프런" })).toHaveAttribute("aria-pressed", "true");
-    for (const label of ["Udemy", "클래스101", "패스트캠퍼스"]) {
+    for (const label of ["YouTube", "패스트캠퍼스", "메가스터디"]) {
+      const chip = screen.getByRole("button", { name: label });
+      expect(chip).toHaveAttribute("aria-pressed", "false");
+      expect(chip).not.toHaveTextContent("준비 중");
+    }
+    for (const label of ["Udemy", "클래스101"]) {
       const chip = screen.getByRole("button", { name: new RegExp(label) });
       expect(chip).toHaveAttribute("aria-pressed", "false");
       expect(chip).toHaveTextContent("준비 중");
@@ -52,7 +66,17 @@ describe("UrlStep (UC-02)", () => {
 
   it("siteNotice면 준비 중 안내를 보인다", () => {
     setup({ siteNotice: "class101" });
-    expect(screen.getByText("클래스101 강의는 준비 중이에요. 지금은 인프런만 지원해요.")).toBeInTheDocument();
+    expect(screen.getByText("클래스101 강의는 준비 중이에요.")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["inflearn", "https://www.inflearn.com/course/..."],
+    ["youtube", "https://www.youtube.com/playlist?list=..."],
+    ["fastcampus", "https://fastcampus.co.kr/..."],
+    ["megastudy", "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=..."],
+  ] as const)("placeholder는 선택한 사이트(%s)를 따른다", (site, placeholder) => {
+    setup({ site });
+    expect(screen.getByRole("textbox", { name: "강의 또는 재생목록 URL" })).toHaveAttribute("placeholder", placeholder);
   });
 
   it("입력하면 onUrlChange, 버튼·Enter면 onSubmit", async () => {
@@ -96,7 +120,7 @@ describe("UrlStep (UC-02)", () => {
   it("errorCode면 role=alert 문구 (E1)", () => {
     setup({ errorCode: "INVALID_URL" });
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "링크 형식이 올바르지 않아요. 인프런 강의나 YouTube 재생목록 주소를 붙여 넣어 주세요.",
+      "링크 형식이 올바르지 않아요. 강의나 재생목록 주소를 붙여 넣어 주세요.",
     );
     expect(screen.queryByRole("button", { name: "계획확인에서 보기" })).not.toBeInTheDocument();
   });
