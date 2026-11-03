@@ -45,3 +45,5 @@ npm run build
 현재 버전은 **인프런 강의 URL만** 지원합니다. 책과 다른 강의 사이트는 준비 중입니다. 계정이나 서버 저장 기능이 없어 저장한 계획은 해당 브라우저에서만 볼 수 있고, 작성 중인 내용은 새로고침 시 사라집니다. 인프런의 페이지 구조가 바뀌면 목차 추출이 실패할 수 있습니다.
 
 설계 판단은 [`docs/ADR.md`](docs/ADR.md), 데이터 흐름은 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), 상세 사용자 흐름은 [`docs/USER_FLOW.md`](docs/USER_FLOW.md)에 정리했습니다.
+
+1차 프로젝트 자료: [실측 평가](docs/EVALUATION.md), [프롬프트와 AI 활용 기록](프롬프트.md), [발표 자료 PDF](submission/Currculator-발표자료.pdf).
