@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { OptionChip } from "@/components/ui/OptionChip";
 import { TextLink } from "@/components/ui/TextLink";
 import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { isSupportedSite, SITES, type SiteId } from "@/lib/state/app-reducer";
+import { SITES, type SiteId } from "@/lib/state/app-reducer";
 import type { ClientErrorCode } from "@/types/curriculum";
 
 const PLACEHOLDERS: Record<SiteId, string> = {
@@ -13,15 +13,11 @@ const PLACEHOLDERS: Record<SiteId, string> = {
   youtube: "https://www.youtube.com/playlist?list=...",
   fastcampus: "https://fastcampus.co.kr/...",
   megastudy: "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=...",
-  // 준비 중 사이트는 선택되지 않지만 타입상 값을 둔다
-  udemy: "https://www.inflearn.com/course/...",
-  class101: "https://www.inflearn.com/course/...",
 };
 
 export interface UrlStepProps {
   url: string;
   site: SiteId;
-  siteNotice: SiteId | null;
   extracting: boolean;
   elapsedSec: number;
   errorCode: ClientErrorCode | null;
@@ -35,8 +31,7 @@ export interface UrlStepProps {
 }
 
 export function UrlStep(props: UrlStepProps) {
-  const { url, site, siteNotice, extracting, elapsedSec, errorCode, hasDup } = props;
-  const noticeLabel = siteNotice ? SITES.find((s) => s.id === siteNotice)?.label : null;
+  const { url, site, extracting, elapsedSec, errorCode, hasDup } = props;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,15 +58,11 @@ export function UrlStep(props: UrlStepProps) {
             <OptionChip
               key={s.id}
               label={s.label}
-              detail={isSupportedSite(s.id) ? undefined : "준비 중"}
               selected={s.id === site}
               onClick={() => props.onPickSite(s.id)}
             />
           ))}
         </div>
-        {noticeLabel ? (
-          <span className="cc-type-caption">{noticeLabel} 강의는 준비 중이에요.</span>
-        ) : null}
       </div>
       <form onSubmit={handleSubmit} className="flex w-full max-w-[640px] flex-wrap justify-center gap-3">
         <input

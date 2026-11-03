@@ -9,7 +9,6 @@ function setup(overrides: Partial<Props> = {}) {
   const props: Props = {
     url: "",
     site: "inflearn",
-    siteNotice: null,
     extracting: false,
     elapsedSec: 0,
     errorCode: null,
@@ -38,35 +37,18 @@ describe("UrlStep (UC-02)", () => {
     expect(screen.getByRole("button", { name: "목차 가져오기" })).toBeEnabled();
   });
 
-  it("사이트 칩: 인프런 선택, 지원 사이트는 부가 문구 없음, Udemy·클래스101은 준비 중", async () => {
+  it("사이트 칩: 지원하는 사이트 4개만 보이고 준비 중 표시는 없다", async () => {
     const props = setup();
     const chips = screen.getAllByRole("button").filter((b) => b.hasAttribute("aria-pressed"));
-    expect(chips.map((b) => b.textContent)).toEqual([
-      "인프런",
-      "YouTube",
-      "패스트캠퍼스",
-      "메가스터디",
-      "Udemy준비 중",
-      "클래스101준비 중",
-    ]);
+    expect(chips.map((b) => b.textContent)).toEqual(["인프런", "YouTube", "패스트캠퍼스", "메가스터디"]);
     expect(screen.getByRole("button", { name: "인프런" })).toHaveAttribute("aria-pressed", "true");
     for (const label of ["YouTube", "패스트캠퍼스", "메가스터디"]) {
-      const chip = screen.getByRole("button", { name: label });
-      expect(chip).toHaveAttribute("aria-pressed", "false");
-      expect(chip).not.toHaveTextContent("준비 중");
+      expect(screen.getByRole("button", { name: label })).toHaveAttribute("aria-pressed", "false");
     }
-    for (const label of ["Udemy", "클래스101"]) {
-      const chip = screen.getByRole("button", { name: new RegExp(label) });
-      expect(chip).toHaveAttribute("aria-pressed", "false");
-      expect(chip).toHaveTextContent("준비 중");
-    }
-    await userEvent.click(screen.getByRole("button", { name: /Udemy/ }));
-    expect(props.onPickSite).toHaveBeenCalledWith("udemy");
-  });
-
-  it("siteNotice면 준비 중 안내를 보인다", () => {
-    setup({ siteNotice: "class101" });
-    expect(screen.getByText("클래스101 강의는 준비 중이에요.")).toBeInTheDocument();
+    expect(screen.queryByText(/준비 중/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Udemy|클래스101/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "메가스터디" }));
+    expect(props.onPickSite).toHaveBeenCalledWith("megastudy");
   });
 
   it.each([

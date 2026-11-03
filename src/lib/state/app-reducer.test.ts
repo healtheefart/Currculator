@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Curriculum } from "@/types/curriculum";
 import type { SavedPlan } from "@/types/plan";
 import { SAMPLE_COURSE_URL } from "@/lib/url-input";
-import { appReducer, createInitialState, isSupportedSite, SITES, type AppAction, type AppState } from "./app-reducer";
+import { appReducer, createInitialState, SITES, type AppAction, type AppState } from "./app-reducer";
 import { createDefaultSettings } from "./presets";
 
 const TODAY = "2026-11-03";
@@ -64,7 +64,6 @@ describe("createInitialState", () => {
         extracting: false,
         errorCode: null,
         dupPlanId: null,
-        siteNotice: null,
         bookNotice: false,
         editingId: null,
         draft: null,
@@ -75,8 +74,8 @@ describe("createInitialState", () => {
   });
 
   it("SITES 순서", () => {
-    expect(SITES.map((s) => s.label)).toEqual(["인프런", "YouTube", "패스트캠퍼스", "메가스터디", "Udemy", "클래스101"]);
-    expect(SITES.map((s) => s.id)).toEqual(["inflearn", "youtube", "fastcampus", "megastudy", "udemy", "class101"]);
+    expect(SITES.map((s) => s.label)).toEqual(["인프런", "YouTube", "패스트캠퍼스", "메가스터디"]);
+    expect(SITES.map((s) => s.id)).toEqual(["inflearn", "youtube", "fastcampus", "megastudy"]);
   });
 });
 
@@ -109,34 +108,9 @@ describe("학습 자료·사이트 선택", () => {
     expect(book.build.bookNotice).toBe(false);
   });
 
-  it("PICK_SITE: 준비 중 사이트는 안내만 띄우고 선택은 그대로", () => {
-    const s = reduce(initial, { type: "PICK_SOURCE", source: "course" }, { type: "PICK_SITE", site: "udemy" });
-    expect(s.build.siteNotice).toBe("udemy");
-    expect(s.build.site).toBe("inflearn");
-    const c = reduce(s, { type: "PICK_SITE", site: "class101" });
-    expect(c.build.siteNotice).toBe("class101");
-    expect(c.build.site).toBe("inflearn");
-    expect(reduce(s, { type: "PICK_SITE", site: "inflearn" }).build.siteNotice).toBeNull();
-  });
-
-  it.each(["inflearn", "youtube", "fastcampus", "megastudy"] as const)("PICK_SITE: 지원 사이트 %s는 선택된다", (site) => {
-    const s = reduce(
-      initial,
-      { type: "PICK_SOURCE", source: "course" },
-      { type: "PICK_SITE", site: "udemy" },
-      { type: "PICK_SITE", site },
-    );
+  it.each(["inflearn", "youtube", "fastcampus", "megastudy"] as const)("PICK_SITE: %s를 선택한다", (site) => {
+    const s = reduce(initial, { type: "PICK_SOURCE", source: "course" }, { type: "PICK_SITE", site });
     expect(s.build.site).toBe(site);
-    expect(s.build.siteNotice).toBeNull();
-  });
-
-  it("isSupportedSite: 인프런·YouTube·패스트캠퍼스·메가스터디만 지원", () => {
-    expect(SITES.filter((s) => isSupportedSite(s.id)).map((s) => s.id)).toEqual([
-      "inflearn",
-      "youtube",
-      "fastcampus",
-      "megastudy",
-    ]);
   });
 
   it("BACK_TO_TYPE: 오류를 지우고 type으로, 추출 중이면 무시", () => {

@@ -6,23 +6,14 @@ import { createDefaultSettings } from "./presets";
 
 export type Menu = "build" | "view";
 export type BuildStage = "type" | "url" | "book" | "edit" | "schedule" | "adjust";
-export type SiteId = "inflearn" | "youtube" | "fastcampus" | "megastudy" | "udemy" | "class101";
+export type SiteId = "inflearn" | "youtube" | "fastcampus" | "megastudy";
 
 export const SITES: readonly { id: SiteId; label: string }[] = [
   { id: "inflearn", label: "인프런" },
   { id: "youtube", label: "YouTube" },
   { id: "fastcampus", label: "패스트캠퍼스" },
   { id: "megastudy", label: "메가스터디" },
-  { id: "udemy", label: "Udemy" },
-  { id: "class101", label: "클래스101" },
 ];
-
-const SUPPORTED_SITES: readonly SiteId[] = ["inflearn", "youtube", "fastcampus", "megastudy"];
-
-/** 추출을 지원하는 사이트인지. 아니면 "준비 중"이다 */
-export function isSupportedSite(site: SiteId): boolean {
-  return SUPPORTED_SITES.includes(site);
-}
 
 export interface BuildState {
   stage: BuildStage;
@@ -31,7 +22,6 @@ export interface BuildState {
   extracting: boolean;
   errorCode: ClientErrorCode | null;
   dupPlanId: string | null; // ALREADY_PLANNED일 때 기존 계획 id
-  siteNotice: SiteId | null; // 준비 중 사이트를 눌렀을 때
   bookNotice: boolean; // 책 목차를 눌렀을 때
   editingId: string | null; // 수정 중인 SavedPlan id (새 계획이면 null)
   draft: PlanDraft | null;
@@ -83,7 +73,6 @@ function createInitialBuild(): BuildState {
     extracting: false,
     errorCode: null,
     dupPlanId: null,
-    siteNotice: null,
     bookNotice: false,
     editingId: null,
     draft: null,
@@ -165,10 +154,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "PICK_SITE":
-      // 준비 중 사이트는 선택을 그대로 두고 안내만 띄운다
-      return isSupportedSite(action.site)
-        ? withBuild(state, { site: action.site, siteNotice: null })
-        : withBuild(state, { siteNotice: action.site });
+      return withBuild(state, { site: action.site });
 
     case "SET_URL":
       if (build.extracting) return state;

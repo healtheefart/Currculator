@@ -26,7 +26,7 @@
 
 ## UC-02 URL로 목차 가져오기 (url 단계)
 - "학습 자료 다시 고르기" 링크(추출 중에는 숨김), 제목 "강의 URL만 넣으세요.", 설명 "목차를 가져와 날짜별 학습 계획으로 나눠 드립니다."
-- "강의 사이트" 칩: 지원 사이트 인프런(기본 선택) / YouTube / 패스트캠퍼스 / 메가스터디, 준비 중 사이트 Udemy / 클래스101(부가 문구 "준비 중"). 준비 중 칩을 누르면 선택은 그대로 두고 "{사이트} 강의는 준비 중이에요." 표시.
+- "강의 사이트" 칩: 인프런(기본 선택) / YouTube / 패스트캠퍼스 / 메가스터디. 지원하는 사이트만 보이며, 칩을 누르면 그 사이트가 선택되고 placeholder가 바뀐다. 지원하지 않는 사이트(Udemy·클래스101 등)는 칩을 두지 않는다(2026-11-03).
 - 입력 + "목차 가져오기" 버튼. Enter도 제출. 입력을 바꾸면 오류 문구가 사라진다. placeholder는 선택한 사이트를 따른다: 인프런 `https://www.inflearn.com/course/...`, YouTube `https://www.youtube.com/playlist?list=...`, 패스트캠퍼스 `https://fastcampus.co.kr/...`, 메가스터디 `https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=...`.
 - "예시 강의로 해보기" 링크 → 입력에 `https://www.inflearn.com/course/introduction-to-clau?cid=344799`를 채운다(추출 중에는 숨김).
 - 추출 중: 입력·버튼 비활성, "강의 정보 가져오는 중…" + 경과 초(`3초`).

@@ -110,7 +110,7 @@ URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED)
 
 ## 상태 관리
 - 서버 상태 없음(DB 없음).
-- `app-reducer`: `menu`("build" | "view"), 계획짜기 상태(`stage`, `url`, `extracting`, `errorCode`, `dupPlanId`, `site/book 안내`, `editingId`, `draft: PlanDraft | null`, `picked`), 계획확인 상태(`viewSel`, `viewTab`), `plans: SavedPlan[]`, `confirm`. 액션은 `"오늘"`·`id`·`savedAt`을 인자로 받는다(reducer 안에서 `new Date()`·난수 금지).
+- `app-reducer`: `menu`("build" | "view"), 계획짜기 상태(`stage`, `url`, `extracting`, `errorCode`, `dupPlanId`, `site`, `bookNotice`, `editingId`, `draft: PlanDraft | null`, `picked`), 계획확인 상태(`viewSel`, `viewTab`), `plans: SavedPlan[]`, `confirm`. 액션은 `"오늘"`·`id`·`savedAt`을 인자로 받는다(reducer 안에서 `new Date()`·난수 금지).
 - `draft-reducer`: `PlanDraft = {curriculum, settings, overrides}`의 편집(제목·시간·제외, 설정, 옮기기·제외·되돌리기). `app-reducer`가 `DRAFT` 액션으로 위임한다.
 - 배분 결과는 `useMemo`로 계산한 파생값이며 state·저장본에 넣지 않는다.
 - 영속화: `lib/storage/plans.ts`가 `currculator:plans:v1`에 `{version:1, plans}`를 저장한다. `page.tsx`가 마운트 후 `loadPlans()`로 한 번 읽고, plans가 사용자 동작(계획하기·저장·삭제)으로 바뀐 경우에만 `savePlans`를 호출한다.
