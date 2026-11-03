@@ -24,7 +24,7 @@
       "status": "completed",
       "started_at": "2026-11-03T17:18:31+0900",
       "summary": "url.ts에 패스트캠퍼스·메가스터디 허용 호스트 4개, megastudy.net→www·/chr/→/teacher_v2/chr/ 정규화, isFastcampusCoursePath·isMegastudyCoursePath·megastudyCourseCode 추가(정확 일치 비교), Platform 타입과 plans.ts 저장본 검증에 fastcampus·megastudy 추가 — 테스트 선작성, lint·typecheck·512 tests 통과",
-      "completed_at": "2026-11-03T17:25:00+0900"
+      "completed_at": "2026-11-03T17:21:13+0900"
     },
     {
       "step": 3,
