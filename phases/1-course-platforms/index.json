@@ -63,7 +63,8 @@
       "name": "client-support",
       "status": "completed",
       "started_at": "2026-11-03T17:33:48+0900",
-      "summary": "url-input.ts에 패스트캠퍼스(한 단계 경로)·메가스터디(teacher_v2/chr 또는 chr lecture_detailview.asp, CHR_CD 숫자) 정확 일치 검사와 megastudy:{CHR_CD} cid 추가, m. 재작성을 m.inflearn.com만으로 좁힘(m.fastcampus·m.megastudy UNSUPPORTED), ERROR_MESSAGES를 USER_FLOW 표에 맞춤, SITES 순서·megastudy 추가·isSupportedSite로 준비 중 판정 통합(준비 중 칩은 선택 유지·\"{사이트} 강의는 준비 중이에요.\"), UrlStep 사이트별 placeholder, PLATFORM_LABELS(src/lib/format/platform.ts)로 CurriculumEditor 플랫폼명 교체, SourceStep 강의 카드 설명은 USER_FLOW 문구 — 테스트 선작성, lint·typecheck·623 tests·build·E2E 3개 통과"
+      "summary": "url-input.ts에 패스트캠퍼스(한 단계 경로)·메가스터디(teacher_v2/chr 또는 chr lecture_detailview.asp, CHR_CD 숫자) 정확 일치 검사와 megastudy:{CHR_CD} cid 추가, m. 재작성을 m.inflearn.com만으로 좁힘(m.fastcampus·m.megastudy UNSUPPORTED), ERROR_MESSAGES를 USER_FLOW 표에 맞춤, SITES 순서·megastudy 추가·isSupportedSite로 준비 중 판정 통합(준비 중 칩은 선택 유지·\"{사이트} 강의는 준비 중이에요.\"), UrlStep 사이트별 placeholder, PLATFORM_LABELS(src/lib/format/platform.ts)로 CurriculumEditor 플랫폼명 교체, SourceStep 강의 카드 설명은 USER_FLOW 문구 — 테스트 선작성, lint·typecheck·623 tests·build·E2E 3개 통과",
+      "completed_at": "2026-11-03T17:38:18+0900"
     }
   ],
   "created_at": "2026-11-03T17:13:15+0900"
