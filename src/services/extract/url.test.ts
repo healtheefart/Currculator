@@ -1,6 +1,14 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { ALLOWED_HOSTS, isAllowedHost, isInflearnCoursePath, normalizeInputUrl } from "./url";
+import {
+  ALLOWED_HOSTS,
+  isAllowedHost,
+  isFastcampusCoursePath,
+  isInflearnCoursePath,
+  isMegastudyCoursePath,
+  megastudyCourseCode,
+  normalizeInputUrl,
+} from "./url";
 
 const EXAMPLE = "https://www.inflearn.com/course/introduction-to-clau?cid=344799";
 
@@ -11,13 +19,17 @@ function accepted(raw: string): boolean {
 }
 
 describe("ALLOWED_HOSTS", () => {
-  it("인프런 호스트 3개와 YouTube 호스트 4개만 담는다", () => {
+  it("인프런 3개·YouTube 4개·패스트캠퍼스 2개·메가스터디 2개 호스트만 담는다", () => {
     expect([...ALLOWED_HOSTS].sort()).toEqual([
+      "fastcampus.co.kr",
       "inf.run",
       "inflearn.com",
       "m.youtube.com",
+      "megastudy.net",
       "music.youtube.com",
+      "www.fastcampus.co.kr",
       "www.inflearn.com",
+      "www.megastudy.net",
       "www.youtube.com",
       "youtube.com",
     ]);
@@ -132,5 +144,119 @@ describe("입력 URL 전체 검사 (normalize → host → path)", () => {
     "",
   ])("거부: %s", (raw) => {
     expect(accepted(raw)).toBe(false);
+  });
+});
+
+const MEGA = "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic";
+
+describe("normalizeInputUrl (패스트캠퍼스·메가스터디)", () => {
+  it("megastudy.net은 www.megastudy.net으로 바꾼다", () => {
+    expect(normalizeInputUrl("megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549")?.href).toBe(
+      "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549",
+    );
+  });
+
+  it("메가스터디 /chr/lecture_detailview.asp는 /teacher_v2/chr/ 경로로 바꾼다(대소문자 무시)", () => {
+    expect(
+      normalizeInputUrl("https://www.megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549&tec_cd=21cholic")?.href,
+    ).toBe("https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549&tec_cd=21cholic");
+    expect(normalizeInputUrl("https://www.megastudy.net/CHR/Lecture_DetailView.asp?CHR_CD=1")?.pathname).toBe(
+      "/teacher_v2/chr/lecture_detailview.asp",
+    );
+  });
+
+  it("다른 호스트의 /chr/ 경로는 바꾸지 않는다", () => {
+    expect(normalizeInputUrl("https://evil.com/chr/lecture_detailview.asp?CHR_CD=1")?.pathname).toBe(
+      "/chr/lecture_detailview.asp",
+    );
+  });
+});
+
+describe("isFastcampusCoursePath", () => {
+  it.each([
+    "https://fastcampus.co.kr/biz_online_claude",
+    "https://www.fastcampus.co.kr/biz_online_claude/",
+    "https://fastcampus.co.kr/data-online_ai-1",
+  ])("강의 경로: %s", (raw) => {
+    expect(isFastcampusCoursePath(new URL(raw))).toBe(true);
+  });
+
+  it.each([
+    "https://fastcampus.co.kr/",
+    "https://fastcampus.co.kr/category/x",
+    "https://fastcampus.co.kr/biz_online_claude/extra",
+    "https://fastcampus.co.kr/%2E%2E",
+    "https://evil.com/biz_online_claude",
+    "https://fastcampus.co.kr.evil.com/biz_online_claude",
+  ])("강의 경로 아님: %s", (raw) => {
+    expect(isFastcampusCoursePath(new URL(raw))).toBe(false);
+  });
+});
+
+describe("isMegastudyCoursePath / megastudyCourseCode", () => {
+  it("허용 경로와 CHR_CD", () => {
+    const url = new URL(MEGA);
+    expect(isMegastudyCoursePath(url)).toBe(true);
+    expect(megastudyCourseCode(url)).toBe("54549");
+  });
+
+  it("경로는 대소문자를 무시한다", () => {
+    expect(
+      isMegastudyCoursePath(new URL("https://www.megastudy.net/Teacher_v2/CHR/Lecture_DetailView.asp?CHR_CD=1")),
+    ).toBe(true);
+  });
+
+  it.each([
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?MAKE_FLG=1",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=",
+    "https://www.megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549",
+    "https://www.megastudy.net/teacher_v2/index.asp?CHR_CD=54549",
+    "https://megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549",
+    "https://evil.com/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549",
+  ])("거부: %s", (raw) => {
+    expect(isMegastudyCoursePath(new URL(raw))).toBe(false);
+  });
+
+  it.each([
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12a",
+  ])("CHR_CD가 숫자가 아니면 null: %s", (raw) => {
+    expect(megastudyCourseCode(new URL(raw))).toBeNull();
+  });
+});
+
+describe("패스트캠퍼스·메가스터디 입력 URL 전체 검사", () => {
+  function acceptedCourse(raw: string): boolean {
+    const url = normalizeInputUrl(raw);
+    if (!url || !isAllowedHost(url)) return false;
+    return isFastcampusCoursePath(url) || isMegastudyCoursePath(url);
+  }
+
+  it.each([
+    "https://fastcampus.co.kr/biz_online_claude",
+    "www.fastcampus.co.kr/biz_online_claude/",
+    MEGA,
+    "https://www.megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic",
+    "megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549",
+    "https://megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549",
+  ])("허용: %s", (raw) => {
+    expect(acceptedCourse(raw)).toBe(true);
+  });
+
+  it.each([
+    "https://fastcampus.co.kr/",
+    "https://fastcampus.co.kr/category/x",
+    "https://fastcampus.co.kr/biz_online_claude/extra",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?MAKE_FLG=1",
+    "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc",
+    "https://www.megastudy.net/teacher_v2/index.asp",
+    "https://fastcampus.co.kr.evil.com/biz_online_claude",
+    "https://www.fastcampus.co.kr@evil.com/x",
+    "http://fastcampus.co.kr/x",
+    "https://evil.com/www.megastudy.net",
+  ])("거부: %s", (raw) => {
+    expect(acceptedCourse(raw)).toBe(false);
   });
 });

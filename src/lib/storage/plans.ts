@@ -78,7 +78,14 @@ function readCurriculum(raw: unknown): Curriculum | null {
   const droppedCount = own(raw, "droppedCount");
   const rawItems = own(raw, "items");
   if (!isString(title) || !isString(sourceUrl) || !isString(courseId)) return null;
-  if (platform !== "inflearn" && platform !== "youtube" && platform !== "book") return null;
+  if (
+    platform !== "inflearn" &&
+    platform !== "youtube" &&
+    platform !== "fastcampus" &&
+    platform !== "megastudy" &&
+    platform !== "book"
+  )
+    return null;
   if (instructor !== null && !isString(instructor)) return null;
   if (!isIntIn(droppedCount, 0, Number.MAX_SAFE_INTEGER)) return null;
   if (!Array.isArray(rawItems)) return null;

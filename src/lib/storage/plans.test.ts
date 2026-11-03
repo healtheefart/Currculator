@@ -98,6 +98,17 @@ describe("savePlans / loadPlans", () => {
     expect(loadPlans(storageWith(value))).toEqual([]);
   });
 
+  it.each([
+    ["fastcampus", "fastcampus:biz_online_claude"],
+    ["megastudy", "megastudy:54549"],
+  ] as const)("platform %s 계획을 복원한다", (platform, courseId) => {
+    const plan = makePlan("p");
+    plan.curriculum = { ...plan.curriculum, platform, courseId };
+    const s = new MemoryStorage();
+    savePlans([plan], s);
+    expect(loadPlans(s)).toEqual([plan]);
+  });
+
   it("계획 하나만 잘못되면 그것만 버린다", () => {
     const bad = rawPlan("bad");
     (bad.curriculum as Record<string, unknown>).platform = "udemy";

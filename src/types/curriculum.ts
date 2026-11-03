@@ -1,8 +1,8 @@
-export type Platform = "inflearn" | "youtube" | "book";
+export type Platform = "inflearn" | "youtube" | "fastcampus" | "megastudy" | "book";
 export type DurationSource = "origin" | "manual";
 
 export interface CurriculumItem {
-  id: string; // 인프런 section/unit id 문자열
+  id: string; // 플랫폼 원본 id 문자열
   title: string;
   level: 0 | 1; // 0 = 섹션(묶음 제목), 1 = 수업(배정 단위)
   order: number; // 목차 전체 순서 (0부터)
@@ -29,7 +29,7 @@ export interface Curriculum {
   title: string;
   sourceUrl: string;
   platform: Platform;
-  courseId: string; // 인프런 강의 id (curriculum 쿼리 키의 숫자). 강의당 계획 1개 판단에 쓴다
+  courseId: string; // 플랫폼별 강의 id(인프런 숫자, `youtube:`, `fastcampus:`, `megastudy:` 접두). 강의당 계획 1개 판단에 쓴다
   instructor: string | null; // 강사명. 여러 명이면 ", "로 이음
   droppedCount: number; // 목차에서 뺀 영상 아닌 수업(퀴즈·과제) 수
   items: CurriculumItem[]; // 평평한 목록, 재귀 구조 금지

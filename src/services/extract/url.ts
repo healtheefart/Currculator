@@ -1,10 +1,31 @@
 /** 서버가 요청할 수 있는 호스트. hostname은 정확히 일치로만 비교한다. */
-export const ALLOWED_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com", "inf.run", "www.youtube.com", "youtube.com", "m.youtube.com", "music.youtube.com"];
+export const ALLOWED_HOSTS: readonly string[] = [
+  "www.inflearn.com",
+  "inflearn.com",
+  "inf.run",
+  "www.youtube.com",
+  "youtube.com",
+  "m.youtube.com",
+  "music.youtube.com",
+  "fastcampus.co.kr",
+  "www.fastcampus.co.kr",
+  "www.megastudy.net",
+  "megastudy.net",
+];
 
 const INFLEARN_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com"];
 
 /** `/course/{slug}` 또는 `/{2글자 locale}/course/{slug}` (끝 슬래시 허용) */
 const COURSE_PATH = /^\/(?:[a-z]{2}\/)?course\/[^/]+\/?$/;
+
+const FASTCAMPUS_HOSTS: readonly string[] = ["fastcampus.co.kr", "www.fastcampus.co.kr"];
+
+/** 패스트캠퍼스 강의 경로: 한 단계 `/{slug}` (끝 슬래시 허용) */
+const FASTCAMPUS_PATH = /^\/[A-Za-z0-9_-]+\/?$/;
+
+const MEGASTUDY_HOST = "www.megastudy.net";
+const MEGASTUDY_SHORT_PATH = "/chr/lecture_detailview.asp";
+const MEGASTUDY_COURSE_PATH = "/teacher_v2/chr/lecture_detailview.asp";
 
 const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:\/\//i;
 
@@ -21,6 +42,11 @@ export function normalizeInputUrl(raw: string): URL | null {
   }
   if (url.hostname === "") return null;
   if (url.hostname === "m.inflearn.com") url.hostname = "www.inflearn.com";
+  if (url.hostname === "megastudy.net") url.hostname = MEGASTUDY_HOST;
+  // /chr/ 경로는 HTTP 200으로 오류 페이지를 돌려주므로 /teacher_v2/chr/ 경로로 바꾼다
+  if (url.hostname === MEGASTUDY_HOST && url.pathname.toLowerCase() === MEGASTUDY_SHORT_PATH) {
+    url.pathname = MEGASTUDY_COURSE_PATH;
+  }
   url.hash = "";
   return url;
 }
@@ -44,4 +70,22 @@ const YOUTUBE_HOSTS: readonly string[] = ["www.youtube.com", "youtube.com", "m.y
 export function isYouTubePlaylistUrl(url: URL): boolean {
   const id = url.searchParams.get("list") ?? "";
   return YOUTUBE_HOSTS.includes(url.hostname) && url.pathname === "/playlist" && /^[A-Za-z0-9_-]+$/.test(id);
+}
+
+export function isFastcampusCoursePath(url: URL): boolean {
+  return FASTCAMPUS_HOSTS.includes(url.hostname) && FASTCAMPUS_PATH.test(url.pathname);
+}
+
+/** 메가스터디 강좌 번호(CHR_CD 숫자 문자열). 숫자가 아니거나 없으면 null */
+export function megastudyCourseCode(url: URL): string | null {
+  const code = url.searchParams.get("CHR_CD");
+  return code !== null && /^\d+$/.test(code) ? code : null;
+}
+
+export function isMegastudyCoursePath(url: URL): boolean {
+  return (
+    url.hostname === MEGASTUDY_HOST &&
+    url.pathname.toLowerCase() === MEGASTUDY_COURSE_PATH &&
+    megastudyCourseCode(url) !== null
+  );
 }
