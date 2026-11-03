@@ -29,6 +29,8 @@ describe("checkCourseUrl", () => {
     "https://www.megastudy.net/chr/lecture_detailview.asp?CHR_CD=12345",
     "https://www.megastudy.net/Teacher_V2/CHR/Lecture_DetailView.asp?CHR_CD=12345",
     "www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?tec_cd=a&CHR_CD=7",
+    "https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic",
+    "https://www.megastudy.net/lecmain/mainh/chr_detail/lecture_detailview.asp?CHR_CD=1",
   ])("허용: %s → null", (raw) => {
     expect(checkCourseUrl(raw)).toBeNull();
   });
@@ -61,6 +63,8 @@ describe("checkCourseUrl", () => {
     "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc",
     "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12a",
     "https://www.megastudy.net/teacher_v2/chr/other.asp?CHR_CD=12345",
+    "https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp",
+    "https://www.megastudy.net/a.b/lecture_detailview.asp?CHR_CD=1",
     "https://www.megastudy.net/",
     "https://megastudy.net.evil.com/teacher_v2/chr/lecture_detailview.asp?CHR_CD=1",
     "https://mbest.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=1",
@@ -104,6 +108,9 @@ describe("cidFromUrl", () => {
       "megastudy:12345",
     );
     expect(cidFromUrl("megastudy.net/chr/lecture_detailview.asp?CHR_CD=7")).toBe("megastudy:7");
+    expect(
+      cidFromUrl("https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1"),
+    ).toBe("megastudy:54549");
     expect(cidFromUrl("https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc")).toBeNull();
     expect(cidFromUrl("https://www.megastudy.net/teacher_v2/chr/other.asp?CHR_CD=12345")).toBeNull();
     expect(cidFromUrl("https://m.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=12345")).toBeNull();

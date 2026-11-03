@@ -109,6 +109,18 @@ describe("parseMegastudyHtml — 인라인 HTML", () => {
     expect(c.title).toBe("R&D 강의");
   });
 
+  it("숫자 엔티티(10진·16진)를 디코딩하고 이중 인코딩·범위 밖 값은 그대로 둔다", () => {
+    const c = parseMegastudyHtml(
+      pageHtml([row("&#91;수능특강&#93; &#x41;&#X42; &amp;#91; &#1114112;", "10:00")], {
+        title: "&#91;수능특강&#93; 수능 중국어",
+      }),
+      COURSE_URL,
+      "1",
+    );
+    expect(c.title).toBe("[수능특강] 수능 중국어");
+    expect(c.items[1].title).toBe("[수능특강] AB &#91; &#1114112;");
+  });
+
   it("수업명이 빈 행은 버리고 순번은 남은 행 기준 0부터", () => {
     const c = parseMegastudyHtml(pageHtml([row(" ", "10:00"), row("a", "10:00"), row("b", "05:00")]), COURSE_URL, "7");
     const lectures = c.items.filter((i) => i.level === 1);

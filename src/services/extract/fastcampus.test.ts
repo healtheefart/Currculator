@@ -210,6 +210,13 @@ describe("parseFastcampusHtml — 변환 규칙", () => {
     expect(parseFastcampusHtml(rscHtml(payload), COURSE_URL).title).toBe("제목 없는 강의");
   });
 
+  it("og:title의 숫자 엔티티(10진·16진)를 디코딩한다", () => {
+    const payload = payloadWith([{ id: 1, type: "PART", title: "P", time: "", child: [clip(11, "a", "00:01:00")] }]);
+    expect(
+      parseFastcampusHtml(rscHtml(payload, { ogTitle: "&#91;입문&#93; &#x41;I | 패스트캠퍼스" }), COURSE_URL).title,
+    ).toBe("[입문] AI");
+  });
+
   it("마지막 ' | 패스트캠퍼스'만 뗀다", () => {
     const payload = payloadWith([{ id: 1, type: "PART", title: "P", time: "", child: [clip(11, "a", "00:01:00")] }]);
     expect(parseFastcampusHtml(rscHtml(payload, { ogTitle: "A | B | 패스트캠퍼스" }), COURSE_URL).title).toBe("A | B");

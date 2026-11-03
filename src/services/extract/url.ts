@@ -30,8 +30,12 @@ const FASTCAMPUS_PATH = /^\/[A-Za-z0-9_-]+\/?$/;
 const MEGASTUDY_HOST = "www.megastudy.net";
 /** 메가스터디 추출기가 맡는 호스트(megastudy.net은 정규화에서 www로 바뀐다) */
 export const MEGASTUDY_HOSTS: readonly string[] = [MEGASTUDY_HOST];
-const MEGASTUDY_SHORT_PATH = "/chr/lecture_detailview.asp";
 const MEGASTUDY_COURSE_PATH = "/teacher_v2/chr/lecture_detailview.asp";
+/**
+ * 사용자가 붙여 넣을 수 있는 메가스터디 강좌 상세 경로: `/chr/`, `/teacher_v2/chr/`,
+ * 강좌 목록 링크 `/lecmain/{메뉴}/chr_detail/` 등. 모두 같은 CHR_CD 상세 페이지다.
+ */
+const MEGASTUDY_DETAIL_PATH = /^(?:\/[A-Za-z0-9_]+)*\/lecture_detailview\.asp$/i;
 
 const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:\/\//i;
 
@@ -49,8 +53,8 @@ export function normalizeInputUrl(raw: string): URL | null {
   if (url.hostname === "") return null;
   if (url.hostname === "m.inflearn.com") url.hostname = "www.inflearn.com";
   if (url.hostname === "megastudy.net") url.hostname = MEGASTUDY_HOST;
-  // /chr/ 경로는 HTTP 200으로 오류 페이지를 돌려주므로 /teacher_v2/chr/ 경로로 바꾼다
-  if (url.hostname === MEGASTUDY_HOST && url.pathname.toLowerCase() === MEGASTUDY_SHORT_PATH) {
+  // 상세 경로는 여러 형태다. /chr/는 HTTP 200으로 오류 페이지를 돌려주므로 요청은 /teacher_v2/chr/ 하나로 모은다
+  if (url.hostname === MEGASTUDY_HOST && MEGASTUDY_DETAIL_PATH.test(url.pathname)) {
     url.pathname = MEGASTUDY_COURSE_PATH;
   }
   url.hash = "";

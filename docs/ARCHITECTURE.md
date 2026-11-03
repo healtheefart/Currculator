@@ -56,7 +56,7 @@ tests/
 ```
 URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED), URL에서 알 수 있는 강의 id로 중복 확인(ALREADY_PLANNED)
   → POST /api/extract {url}
-      → url.ts: 정규화(trim, https 보정, m.inflearn → www, megastudy.net → www, 메가스터디 /chr/ → /teacher_v2/chr/, 해시 제거) + 허용 호스트·플랫폼별 경로 검사
+      → url.ts: 정규화(trim, https 보정, m.inflearn → www, megastudy.net → www, 메가스터디 `…/lecture_detailview.asp`(/chr/, /lecmain/{메뉴}/chr_detail/ 등) → /teacher_v2/chr/, 해시 제거) + 허용 호스트·플랫폼별 경로 검사
       → hostname 정확 일치로 플랫폼별 추출기 선택: inflearn.ts / youtube.ts / fastcampus.ts / megastudy.ts
       → fetch-page.ts: GET (일반 브라우저 UA, 전체 30초 타임아웃, 수동 리다이렉트 최대 5회, 각 대상 요청 전 호스트·경로 검사)
       → 플랫폼별 파싱(__NEXT_DATA__ / ytInitialData / RSC payload / EUC-KR 표) → Curriculum
@@ -87,7 +87,7 @@ URL 입력 → url-input.ts: 형식·호스트 검사(INVALID_URL / UNSUPPORTED)
 - 실측 fixture(biz_online_claude): courseId 261444, Part 7개, CHAPTER 16개, CLIP 51개(`isAppendix` 0개), CLIP `time` 합 43,726초(12시간 8분 46초).
 
 ## 메가스터디 파싱
-- 강의 URL: `https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. `megastudy.net`은 `www.megastudy.net`으로, `/chr/lecture_detailview.asp`는 `/teacher_v2/chr/lecture_detailview.asp`로 정규화한다(`/chr/` 경로는 HTTP 200으로 본문에 `| 404`가 든 오류 페이지를 돌려준다). robots.txt는 이 경로를 막지 않는다(2026-11-03 확인).
+- 강의 URL: `https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. `megastudy.net`은 `www.megastudy.net`으로, `/chr/`, 강좌 목록 링크의 `/lecmain/{메뉴}/chr_detail/`(예: `/lecmain/mains/chr_detail/`, `/lecmain/mains/mainsgo12/chr_detail/`) 등 영문·숫자·`_` 디렉터리 아래의 `lecture_detailview.asp`는 모두 `/teacher_v2/chr/lecture_detailview.asp`로 정규화한다(`/chr/` 경로는 HTTP 200으로 본문에 `| 404`가 든 오류 페이지를 돌려준다). robots.txt는 이 경로를 막지 않는다(2026-11-03 확인).
 - 서버가 만든 HTML이고 EUC-KR 인코딩이다. 응답 바이트를 `TextDecoder("euc-kr")`로 디코딩한다.
 - `<p class="lstedu--subbx_tit">강의목차</p>` 바로 뒤의 `<table class="tb_char_opt">`(같은 class의 표가 여러 개 있고, `border` 등 다른 속성이 앞에 올 수 있다)의 `<tbody>` 각 `<tr>`에서 첫 `<td>`가 수업명, 마지막 `<td class="lecture-time">`이 재생시간(`56:25` 또는 `1:09:03`)이다. 가운데 `lecture-time` 칸(교재, `-`)은 쓰지 않는다.
 - 섹션이 없으므로 강의명으로 가상 섹션 1개(level 0)를 만들고 모든 행을 그 아래 수업으로 둔다. OT 행도 수업으로 포함한다.

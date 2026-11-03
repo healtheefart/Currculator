@@ -35,7 +35,7 @@
   - 인프런: `?cid=` 있음 / cid 없는 slug(308 리다이렉트로 cid 붙음) / `/en/`·`/ja/`·`/vi/` 경로 / 추적 파라미터 / `inf.run` 단축 링크(301) / `m.inflearn.com`(→ `www`).
   - YouTube: `/playlist?list={id}` (`www.`·`m.`·`music.` 호스트 포함).
   - 패스트캠퍼스: `fastcampus.co.kr/{slug}`, `www.fastcampus.co.kr/{slug}` (`www.` 유무 모두 허용, 경로는 한 단계).
-  - 메가스터디: `www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. `/chr/lecture_detailview.asp` 경로는 `/teacher_v2/chr/`로 정규화하고, `megastudy.net`은 `www.megastudy.net`으로 바꾼다.
+  - 메가스터디: `www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD={숫자}`. 강좌 목록 링크(`/lecmain/{메뉴}/chr_detail/lecture_detailview.asp?CHR_CD=…`)와 `/chr/lecture_detailview.asp` 경로는 `/teacher_v2/chr/`로 정규화하고, `megastudy.net`은 `www.megastudy.net`으로 바꾼다.
 - 예외:
   - E1 빈 값·URL 형식 아님 → `INVALID_URL` (클라이언트에서 판단, 서버 요청 없음)
   - E2 허용 호스트가 아닌 사이트, 플랫폼별 허용 경로가 아닌 주소(인프런 `/course/` 아님, YouTube `/playlist?list=` 아님, 패스트캠퍼스 두 단계 이상 경로, 메가스터디 `CHR_CD` 숫자 없음), `inf.run`이 강의가 아닌 곳으로 리다이렉트 → `UNSUPPORTED` (명백한 경우 클라이언트에서 먼저 판단)

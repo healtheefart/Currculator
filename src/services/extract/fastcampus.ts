@@ -46,8 +46,15 @@ function childrenOf(node: Obj): unknown[] {
   return Array.isArray(node.child) ? node.child : [];
 }
 
+/** `&#91;`·`&#x41;` 같은 숫자 엔티티. 유니코드 범위 밖이면 그대로 둔다 */
+function decodeNumericEntity(match: string, dec: string | undefined, hex: string | undefined): string {
+  const code = dec !== undefined ? Number.parseInt(dec, 10) : Number.parseInt(hex ?? "", 16);
+  return Number.isInteger(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : match;
+}
+
 function decodeEntities(s: string): string {
   return s
+    .replace(/&#(?:(\d{1,7})|[xX]([0-9a-fA-F]{1,6}));/g, decodeNumericEntity)
     .replace(/&quot;/g, '"')
     .replace(/&#0*39;|&#x0*27;|&apos;/gi, "'")
     .replace(/&lt;/g, "<")

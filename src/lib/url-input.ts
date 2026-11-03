@@ -11,7 +11,8 @@ const MEGASTUDY_HOSTS: readonly string[] = ["www.megastudy.net", "megastudy.net"
 const LOCALE_PREFIX = /^\/(en|ja|vi)(?=\/)/;
 /** 패스트캠퍼스 강의 경로: 한 단계 `/{slug}` (끝 슬래시 허용) */
 const FASTCAMPUS_PATH = /^\/[A-Za-z0-9_-]+\/?$/;
-const MEGASTUDY_PATHS: readonly string[] = ["/teacher_v2/chr/lecture_detailview.asp", "/chr/lecture_detailview.asp"];
+/** 메가스터디 강좌 상세 경로(`/chr/`, `/teacher_v2/chr/`, 강좌 목록 링크 `/lecmain/{메뉴}/chr_detail/` 등) */
+const MEGASTUDY_DETAIL_PATH = /^(?:\/[A-Za-z0-9_]+)*\/lecture_detailview\.asp$/i;
 
 function toUrl(raw: string): URL | null {
   const trimmed = raw.trim();
@@ -33,7 +34,7 @@ function toUrl(raw: string): URL | null {
 /** 메가스터디 강의 URL이면 CHR_CD 숫자 문자열, 아니면 null */
 function megastudyCode(url: URL): string | null {
   if (!MEGASTUDY_HOSTS.includes(url.hostname)) return null; // 정확히 일치
-  if (!MEGASTUDY_PATHS.includes(url.pathname.toLowerCase())) return null;
+  if (!MEGASTUDY_DETAIL_PATH.test(url.pathname)) return null;
   const code = url.searchParams.get("CHR_CD");
   return code !== null && /^\d+$/.test(code) ? code : null;
 }

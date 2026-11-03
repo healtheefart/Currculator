@@ -165,6 +165,26 @@ describe("normalizeInputUrl (패스트캠퍼스·메가스터디)", () => {
     );
   });
 
+  it("메가스터디 강좌 목록 링크(/lecmain/.../chr_detail/)도 /teacher_v2/chr/ 경로로 바꾼다", () => {
+    expect(
+      normalizeInputUrl(
+        "https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic",
+      )?.href,
+    ).toBe("https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic");
+    expect(
+      normalizeInputUrl("https://www.megastudy.net/lecmain/mainh/chr_detail/lecture_detailview.asp?CHR_CD=1")?.pathname,
+    ).toBe("/teacher_v2/chr/lecture_detailview.asp");
+  });
+
+  it("lecture_detailview.asp가 아닌 메가스터디 경로는 바꾸지 않는다", () => {
+    expect(normalizeInputUrl("https://www.megastudy.net/lecmain/mains/chr_detail/other.asp?CHR_CD=1")?.pathname).toBe(
+      "/lecmain/mains/chr_detail/other.asp",
+    );
+    expect(normalizeInputUrl("https://www.megastudy.net/a.b/lecture_detailview.asp?CHR_CD=1")?.pathname).toBe(
+      "/a.b/lecture_detailview.asp",
+    );
+  });
+
   it("다른 호스트의 /chr/ 경로는 바꾸지 않는다", () => {
     expect(normalizeInputUrl("https://evil.com/chr/lecture_detailview.asp?CHR_CD=1")?.pathname).toBe(
       "/chr/lecture_detailview.asp",
@@ -241,6 +261,7 @@ describe("패스트캠퍼스·메가스터디 입력 URL 전체 검사", () => {
     "https://www.megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic",
     "megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=54549",
     "https://megastudy.net/chr/lecture_detailview.asp?CHR_CD=54549",
+    "https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp?CHR_CD=54549&MAKE_FLG=1&tec_cd=21cholic",
   ])("허용: %s", (raw) => {
     expect(acceptedCourse(raw)).toBe(true);
   });
@@ -252,6 +273,8 @@ describe("패스트캠퍼스·메가스터디 입력 URL 전체 검사", () => {
     "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?MAKE_FLG=1",
     "https://www.megastudy.net/teacher_v2/chr/lecture_detailview.asp?CHR_CD=abc",
     "https://www.megastudy.net/teacher_v2/index.asp",
+    "https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp",
+    "https://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp?CHR_CD=abc",
     "https://fastcampus.co.kr.evil.com/biz_online_claude",
     "https://www.fastcampus.co.kr@evil.com/x",
     "http://fastcampus.co.kr/x",
