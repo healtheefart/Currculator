@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { ExtractError } from "@/services/extract/errors";
 import { createFixtureFetch } from "@/services/extract/fixture-fetch";
 import { fetchInflearnCurriculum } from "@/services/extract/inflearn";
+import { fetchYouTubePlaylist } from "@/services/extract/youtube";
 import { normalizeInputUrl } from "@/services/extract/url";
 import type { ExtractErrorCode, ExtractResponse } from "@/types/curriculum";
 
@@ -45,7 +46,9 @@ export async function POST(request: Request): Promise<Response> {
   if (url === null) return fail("INVALID_URL");
 
   try {
-    const curriculum = await fetchInflearnCurriculum(url, pickFetch());
+    const curriculum = url.hostname.endsWith("youtube.com")
+      ? await fetchYouTubePlaylist(url, fetch)
+      : await fetchInflearnCurriculum(url, pickFetch());
     return respond({ ok: true, curriculum }, 200);
   } catch (err) {
     // 상세(원인·stack)는 서버 로그에만 남기고 응답에는 code만 넣는다

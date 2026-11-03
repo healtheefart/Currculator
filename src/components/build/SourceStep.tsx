@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/Badge";
 import { BookOpenIcon, MonitorPlayIcon } from "@/components/ui/icons";
 
 export interface SourceStepProps {
@@ -35,7 +34,7 @@ export function SourceStep({ bookNotice, onPick }: SourceStepProps) {
         >
           <MonitorPlayIcon size={24} />
           <span className="cc-type-tagline mt-auto">강의 커리큘럼</span>
-          <span className="cc-type-caption text-text-secondary">온라인 강의 URL로 목차를 가져와요.</span>
+          <span className="cc-type-caption text-text-secondary">인프런 강의나 YouTube 재생목록 URL로 목차를 가져와요.</span>
         </button>
         <button
           type="button"
@@ -45,17 +44,9 @@ export function SourceStep({ bookNotice, onPick }: SourceStepProps) {
         >
           <BookOpenIcon size={24} />
           <span className="cc-type-tagline mt-auto">책 목차</span>
-          <span className="cc-type-caption text-text-secondary">ISBN으로 책의 목차와 쪽수를 가져와요.</span>
-          <span className="self-start">
-            <Badge tone="gray">준비 중</Badge>
-          </span>
+          <span className="cc-type-caption text-text-secondary">책 제목이나 ISBN으로 목차와 페이지 정보를 찾아요.</span>
         </button>
       </div>
-      {bookNotice ? (
-        <p className="cc-type-caption m-0 max-w-[640px]">
-          책 목차로 계획 짜기는 준비 중이에요. 지금은 강의 커리큘럼만 지원해요.
-        </p>
-      ) : null}
     </div>
   );
 }

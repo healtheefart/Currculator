@@ -5,6 +5,7 @@ export const SAMPLE_COURSE_URL = "https://www.inflearn.com/course/introduction-t
 
 const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:\/\//i;
 const INFLEARN_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com"];
+const YOUTUBE_HOSTS: readonly string[] = ["www.youtube.com", "youtube.com", "m.youtube.com", "music.youtube.com"];
 const LOCALE_PREFIX = /^\/(en|ja|vi)(?=\/)/;
 
 function toUrl(raw: string): URL | null {
@@ -27,6 +28,11 @@ export function checkCourseUrl(raw: string): "INVALID_URL" | "UNSUPPORTED" | nul
   const url = toUrl(raw);
   if (url === null) return "INVALID_URL";
   if (url.hostname === "inf.run") return null;
+  if (YOUTUBE_HOSTS.includes(url.hostname)) {
+    return url.pathname === "/playlist" && /^[A-Za-z0-9_-]+$/.test(url.searchParams.get("list") ?? "")
+      ? null
+      : "UNSUPPORTED";
+  }
   if (!INFLEARN_HOSTS.includes(url.hostname)) return "UNSUPPORTED"; // 정확히 일치
   const path = url.pathname.replace(LOCALE_PREFIX, "");
   if (!path.startsWith("/course/")) return "UNSUPPORTED";
@@ -34,6 +40,11 @@ export function checkCourseUrl(raw: string): "INVALID_URL" | "UNSUPPORTED" | nul
 }
 
 export function cidFromUrl(raw: string): string | null {
-  const cid = toUrl(raw)?.searchParams.get("cid");
+  const url = toUrl(raw);
+  if (url && YOUTUBE_HOSTS.includes(url.hostname)) {
+    const id = url.searchParams.get("list");
+    return id && /^[A-Za-z0-9_-]+$/.test(id) ? `youtube:${id}` : null;
+  }
+  const cid = url?.searchParams.get("cid");
   return cid != null && /^\d+$/.test(cid) ? cid : null;
 }

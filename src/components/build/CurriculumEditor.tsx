@@ -116,7 +116,7 @@ export function CurriculumEditor({ curriculum, multiplier, onAction }: Curriculu
         <input
           type="text"
           inputMode="numeric"
-          aria-label="재생 시간(분)"
+          aria-label={curriculum.platform === "book" ? "학습 시간(분)" : "재생 시간(분)"}
           aria-invalid={minInvalid}
           value={minText}
           placeholder="—"
@@ -140,13 +140,13 @@ export function CurriculumEditor({ curriculum, multiplier, onAction }: Curriculu
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <span className="cc-type-caption-strong text-text-tertiary">
-          {curriculum.instructor ? `인프런 · ${curriculum.instructor}` : "인프런"}
+          {curriculum.instructor ? `${curriculum.platform === "youtube" ? "YouTube" : curriculum.platform === "book" ? "책" : "인프런"} · ${curriculum.instructor}` : curriculum.platform === "youtube" ? "YouTube" : curriculum.platform === "book" ? "책 학습" : "인프런"}
         </span>
         <h1 className="cc-type-display-lg m-0 text-balance" style={{ fontSize: "clamp(28px,4vw,40px)" }}>
           {curriculum.title}
         </h1>
         <span className="cc-type-caption tabular-nums text-text-secondary">
-          {`계획에 넣을 수업 ${counted.length}개 · 재생 ${formatDuration(playSec)} · 예상 ${formatDuration(
+          {`계획에 넣을 ${curriculum.platform === "book" ? "목차" : "수업"} ${counted.length}개 · ${curriculum.platform === "book" ? "학습" : "재생"} ${formatDuration(playSec)} · 예상 ${formatDuration(
             effortSec(playSec, multiplier),
           )}`}
         </span>
@@ -154,12 +154,20 @@ export function CurriculumEditor({ curriculum, multiplier, onAction }: Curriculu
       <div className="flex flex-col gap-4">
         <span className="cc-type-caption text-text-tertiary">
           {curriculum.droppedCount > 0
-            ? `퀴즈·과제 ${curriculum.droppedCount}개는 목차에서 뺐어요. 이미 들은 수업은 체크를 풀어 계획에서 빼세요.`
-            : "이미 들은 수업은 체크를 풀어 계획에서 빼세요."}
+            ? curriculum.platform === "youtube"
+              ? `정보를 가져올 수 없는 영상 ${curriculum.droppedCount}개는 건너뛰었어요. 이미 본 영상은 체크를 풀어 계획에서 빼세요.`
+              : curriculum.platform === "book"
+                ? `페이지 정보가 있는 목차 ${curriculum.droppedCount}개를 불러오지 못했어요. 이미 읽은 목차는 체크를 풀어 계획에서 빼세요.`
+                : `퀴즈·과제 ${curriculum.droppedCount}개는 목차에서 뺐어요. 이미 들은 수업은 체크를 풀어 계획에서 빼세요.`
+            : curriculum.platform === "youtube"
+              ? "이미 본 영상은 체크를 풀어 계획에서 빼세요."
+              : curriculum.platform === "book"
+                ? "이미 읽은 목차는 체크를 풀어 계획에서 빼세요."
+                : "이미 들은 수업은 체크를 풀어 계획에서 빼세요."}
         </span>
         {missingCount > 0 ? (
           <div className="cc-type-caption rounded-[18px] bg-tile px-6 py-4 text-[#fff]">
-            {`재생시간이 없는 수업이 ${missingCount}개 있어요. 입력하기 전까지 배분에서 빠집니다.`}
+            {`${curriculum.platform === "book" ? "학습시간" : "재생시간"}이 없는 ${curriculum.platform === "book" ? "목차" : "수업"}이 ${missingCount}개 있어요. 입력하기 전까지 배분에서 빠집니다.`}
           </div>
         ) : null}
         {sections.map((section, index) => {
@@ -174,7 +182,7 @@ export function CurriculumEditor({ curriculum, multiplier, onAction }: Curriculu
               className="overflow-hidden rounded-[18px] border border-solid border-hairline bg-canvas"
             >
               <div className="flex items-baseline gap-3 px-5 py-4">
-                <span className="cc-type-caption-strong flex-none text-text-tertiary">섹션 {index + 1}</span>
+                <span className="cc-type-caption-strong flex-none text-text-tertiary">{curriculum.platform === "book" ? "책" : "섹션"} {index + 1}</span>
                 <span className="cc-type-body-strong min-w-0 flex-1 break-words">{section.title}</span>
                 <span className="cc-type-caption flex-none tabular-nums text-text-tertiary">
                   {formatDuration(sectionSec)}
@@ -182,8 +190,8 @@ export function CurriculumEditor({ curriculum, multiplier, onAction }: Curriculu
               </div>
               <div className={`${GRID} cc-type-fine-print border-t border-solid border-divider text-text-tertiary`}>
                 <span>추가</span>
-                <span>수업</span>
-                <span className="text-center">재생(분)</span>
+                <span>{curriculum.platform === "book" ? "목차" : "수업"}</span>
+                <span className="text-center">{curriculum.platform === "book" ? "학습(분)" : "재생(분)"}</span>
                 <span className="text-right">예상</span>
               </div>
               {sectionLessons.map(renderLesson)}

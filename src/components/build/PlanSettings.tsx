@@ -8,12 +8,14 @@ import type { DraftAction } from "@/lib/state/draft-reducer";
 import { parseMinutes, parseMultiplier } from "@/lib/state/inputs";
 import { PRESETS, PRESET_ORDER, matchPreset } from "@/lib/state/presets";
 import type { IsoDate, PlanSettings as Settings } from "@/types/plan";
+import type { Platform } from "@/types/curriculum";
 import { RestDayPicker } from "./RestDayPicker";
 
 export interface PlanSettingsProps {
   settings: Settings;
   today: IsoDate;
   onAction: (a: DraftAction) => void;
+  platform?: Platform;
 }
 
 // 화면 표시 순서: 월화수목금토일 (데이터 인덱스 0 = 일요일)
@@ -33,7 +35,7 @@ const ERROR_BORDER = "border-2 border-ink";
 
 type DraftKey = `min:${number}` | "tol" | "mult";
 
-export function PlanSettings({ settings, today, onAction }: PlanSettingsProps) {
+export function PlanSettings({ settings, today, onAction, platform = "inflearn" }: PlanSettingsProps) {
   // 입력 중인 문자열. 유효하면 바로 dispatch하고, 잘못된 값은 상태를 바꾸지 않고 문자열과 오류만 보인다.
   const [drafts, setDrafts] = useState<Partial<Record<DraftKey, string>>>({});
 
@@ -153,11 +155,11 @@ export function PlanSettings({ settings, today, onAction }: PlanSettingsProps) {
           <div className="flex flex-col gap-2">
             <span className="cc-type-caption-strong">예상 학습시간</span>
             <span className="cc-type-body flex items-center gap-2">
-              재생시간 ×
+              {platform === "book" ? "쪽당 학습시간 배수 ×" : "재생시간 ×"}
               <input
                 type="text"
                 inputMode="decimal"
-                aria-label="재생시간 배수"
+                aria-label={platform === "book" ? "쪽당 학습시간 배수" : "재생시간 배수"}
                 aria-invalid={multInvalid}
                 value={textOf("mult", String(settings.lectureMultiplier))}
                 onChange={(e) => {

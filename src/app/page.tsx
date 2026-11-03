@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { SourceStep } from "@/components/build/SourceStep";
 import { UrlStep } from "@/components/build/UrlStep";
+import { BookStep } from "@/components/build/BookStep";
 import { CurriculumEditor } from "@/components/build/CurriculumEditor";
 import { PlanSettings } from "@/components/build/PlanSettings";
 import { PlanSummary } from "@/components/plan/PlanSummary";
@@ -27,7 +28,8 @@ import { loadPlans, savePlans } from "@/lib/storage/plans";
 import { checkCourseUrl, cidFromUrl } from "@/lib/url-input";
 import type { IsoDate, PlanFailureReason } from "@/types/plan";
 
-const NEW_STEPS: { key: BuildStage; label: string }[] = [{ key: "type", label: "자료 선택" }, { key: "url", label: "강의 URL" }, { key: "edit", label: "목차 확인" }, { key: "schedule", label: "일정 설정" }];
+const COURSE_STEPS: { key: BuildStage; label: string }[] = [{ key: "type", label: "자료 선택" }, { key: "url", label: "강의 URL" }, { key: "edit", label: "목차 확인" }, { key: "schedule", label: "일정 설정" }];
+const BOOK_STEPS: { key: BuildStage; label: string }[] = [{ key: "type", label: "자료 선택" }, { key: "book", label: "책 검색" }, { key: "edit", label: "목차 확인" }, { key: "schedule", label: "일정 설정" }];
 const EDIT_STEPS: { key: BuildStage; label: string }[] = [{ key: "edit", label: "목차 확인" }, { key: "schedule", label: "일정 설정" }, { key: "adjust", label: "계획 조정" }];
 
 export default function Home() {
@@ -71,8 +73,8 @@ export default function Home() {
   const saveTime = () => new Date().toISOString();
   const create = () => { if (!draftResult?.ok) return; dispatch({ type: "CREATE_PLAN", id: globalThis.crypto?.randomUUID?.() ?? `p${Date.now()}`, savedAt: saveTime() }); window.scrollTo?.(0, 0); };
   const saveEdit = () => { if (!draftResult?.ok) return; dispatch({ type: "SAVE_EDIT", savedAt: saveTime() }); window.scrollTo?.(0, 0); };
-  const steps = state.build.editingId ? EDIT_STEPS : NEW_STEPS;
-  const reachable = draft ? (state.build.editingId ? ["edit", "schedule", "adjust"] : ["edit", "schedule"]) : state.build.stage === "url" && !state.build.extracting ? ["type", "url"] : ["type"];
+  const steps = state.build.editingId ? EDIT_STEPS : draft?.curriculum.platform === "book" ? BOOK_STEPS : COURSE_STEPS;
+  const reachable = draft ? (state.build.editingId ? ["edit", "schedule", "adjust"] : ["edit", "schedule"]) : (state.build.stage === "url" || state.build.stage === "book") && !state.build.extracting ? ["type", state.build.stage] : ["type"];
   const failure: PlanFailureReason | null = draftResult && !draftResult.ok ? draftResult.reason : null;
   const defaultViewMonth = monthOf(viewDays.find((day) => day.date >= today)?.date ?? viewDays[0]?.date ?? today);
 
@@ -81,10 +83,11 @@ export default function Home() {
     {!ready ? <main className="mx-auto max-w-[980px] px-5 py-20" aria-busy="true" /> : state.menu === "build" ? <>
       <StepBar steps={steps} currentKey={state.build.stage} reachableKeys={reachable} onSelect={(key) => go(key as BuildStage)} editing={state.build.editingId !== null} />
       {state.build.stage === "type" && <SourceStep bookNotice={state.build.bookNotice} onPick={(source) => dispatch({ type: "PICK_SOURCE", source })} />}
-      {state.build.stage === "url" && <UrlStep url={state.build.url} site="inflearn" siteNotice={state.build.siteNotice} extracting={state.build.extracting} elapsedSec={elapsedSec} errorCode={state.build.errorCode} hasDup={Boolean(state.build.dupPlanId)} onUrlChange={(url) => dispatch({ type: "SET_URL", url })} onSubmit={submitUrl} onPickSite={(site) => dispatch({ type: "PICK_SITE", site })} onFillSample={() => dispatch({ type: "FILL_SAMPLE" })} onBack={() => dispatch({ type: "BACK_TO_TYPE" })} onOpenDup={() => dispatch({ type: "OPEN_DUP" })} />}
+      {state.build.stage === "url" && <UrlStep url={state.build.url} site={state.build.site} siteNotice={state.build.siteNotice} extracting={state.build.extracting} elapsedSec={elapsedSec} errorCode={state.build.errorCode} hasDup={Boolean(state.build.dupPlanId)} onUrlChange={(url) => dispatch({ type: "SET_URL", url })} onSubmit={submitUrl} onPickSite={(site) => dispatch({ type: "PICK_SITE", site })} onFillSample={() => dispatch({ type: "FILL_SAMPLE" })} onBack={() => dispatch({ type: "BACK_TO_TYPE" })} onOpenDup={() => dispatch({ type: "OPEN_DUP" })} />}
+      {state.build.stage === "book" && <BookStep extracting={state.build.extracting} hasDup={Boolean(state.build.dupPlanId)} onSearchStart={() => dispatch({ type: "BOOK_SEARCH_START" })} onSearchEnd={() => dispatch({ type: "BOOK_SEARCH_END" })} onSelect={(curriculum) => dispatch({ type: "BOOK_SELECTED", curriculum, today })} onBack={() => dispatch({ type: "BACK_TO_TYPE" })} onOpenDup={() => dispatch({ type: "OPEN_DUP" })} />}
       {draft && <main className="mx-auto max-w-[980px] px-5 pb-24 pt-10">
         {state.build.stage === "edit" && <CurriculumEditor curriculum={draft.curriculum} multiplier={draft.settings.lectureMultiplier} onAction={(action) => dispatch({ type: "DRAFT", action })} />}
-        {state.build.stage === "schedule" && <PlanSettings settings={draft.settings} today={today} onAction={(action) => dispatch({ type: "DRAFT", action })} />}
+        {state.build.stage === "schedule" && <PlanSettings settings={draft.settings} today={today} platform={draft.curriculum.platform} onAction={(action) => dispatch({ type: "DRAFT", action })} />}
         {state.build.stage === "adjust" && <><h1 className="cc-type-display-lg mb-6">계획 조정</h1><PlanSummary title={draft.curriculum.title} days={draftDays} /><PlanViewTabs heading="계획 조정" tab={adjustTab} onTab={setAdjustTab}>{adjustTab === "list" ? <><PlanList days={draftDays} today={today} editable baseDateById={adjusted?.baseDateById} hasOverrides={Object.keys(draft.overrides).length > 0} onAction={(action) => dispatch({ type: "DRAFT", action })} /><RemovedList curriculum={draft.curriculum} settings={draft.settings} removedItemIds={adjusted?.removedItemIds ?? []} onRestore={(itemId) => dispatch({ type: "DRAFT", action: { type: "RESTORE_ITEM", itemId } })} /></> : <PlanCalendar days={draftDays} today={today} defaultMonth={monthOf(draftDays[0]?.date ?? today)} />}</PlanViewTabs></>}
         <div className="mt-10 flex flex-wrap items-center justify-end gap-3 border-t border-hairline pt-6">
           {state.build.editingId && <Button variant="secondary" onClick={() => dispatch({ type: "CANCEL_EDIT" })}>수정 취소</Button>}

@@ -1,4 +1,4 @@
-export type Platform = "inflearn";
+export type Platform = "inflearn" | "youtube" | "book";
 export type DurationSource = "origin" | "manual";
 
 export interface CurriculumItem {
@@ -10,6 +10,19 @@ export interface CurriculumItem {
   durationSec: number | null; // 수업만. 누락이면 null. 섹션은 null
   source: DurationSource;
   excluded: boolean; // 사용자가 제외한 수업 (섹션은 항상 false)
+  pageStart?: number | null;
+  pageEnd?: number | null;
+}
+
+export interface BookSearchResult {
+  isbn: string;
+  title: string;
+  author: string;
+  publisher: string;
+  publishDate: string;
+  pageCount: number | null;
+  coverUrl: string | null;
+  chapters: { title: string; pageStart: number; pageEnd: number }[];
 }
 
 export interface Curriculum {

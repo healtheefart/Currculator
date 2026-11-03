@@ -61,7 +61,11 @@ function readItem(raw: unknown): CurriculumItem | null {
   }
   if (source !== "origin" && source !== "manual") return null;
   if (typeof excluded !== "boolean") return null;
-  return { id, title, level, order, sectionId, durationSec, source, excluded };
+  const pageStart = own(raw, "pageStart");
+  const pageEnd = own(raw, "pageEnd");
+  if (pageStart !== undefined && pageStart !== null && !isIntIn(pageStart, 1, Number.MAX_SAFE_INTEGER)) return null;
+  if (pageEnd !== undefined && pageEnd !== null && !isIntIn(pageEnd, 1, Number.MAX_SAFE_INTEGER)) return null;
+  return { id, title, level, order, sectionId, durationSec, source, excluded, ...(pageStart !== undefined ? { pageStart } : {}), ...(pageEnd !== undefined ? { pageEnd } : {}) };
 }
 
 function readCurriculum(raw: unknown): Curriculum | null {
@@ -74,7 +78,7 @@ function readCurriculum(raw: unknown): Curriculum | null {
   const droppedCount = own(raw, "droppedCount");
   const rawItems = own(raw, "items");
   if (!isString(title) || !isString(sourceUrl) || !isString(courseId)) return null;
-  if (platform !== "inflearn") return null;
+  if (platform !== "inflearn" && platform !== "youtube" && platform !== "book") return null;
   if (instructor !== null && !isString(instructor)) return null;
   if (!isIntIn(droppedCount, 0, Number.MAX_SAFE_INTEGER)) return null;
   if (!Array.isArray(rawItems)) return null;

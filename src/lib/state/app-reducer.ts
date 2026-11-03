@@ -5,11 +5,12 @@ import { draftReducer, type DraftAction, type PlanDraft } from "./draft-reducer"
 import { createDefaultSettings } from "./presets";
 
 export type Menu = "build" | "view";
-export type BuildStage = "type" | "url" | "edit" | "schedule" | "adjust";
-export type SiteId = "inflearn" | "udemy" | "class101" | "fastcampus";
+export type BuildStage = "type" | "url" | "book" | "edit" | "schedule" | "adjust";
+export type SiteId = "inflearn" | "youtube" | "udemy" | "class101" | "fastcampus";
 
 export const SITES: readonly { id: SiteId; label: string }[] = [
   { id: "inflearn", label: "인프런" },
+  { id: "youtube", label: "YouTube" },
   { id: "udemy", label: "Udemy" },
   { id: "class101", label: "클래스101" },
   { id: "fastcampus", label: "패스트캠퍼스" },
@@ -17,6 +18,7 @@ export const SITES: readonly { id: SiteId; label: string }[] = [
 
 export interface BuildState {
   stage: BuildStage;
+  site: SiteId;
   url: string;
   extracting: boolean;
   errorCode: ClientErrorCode | null;
@@ -41,6 +43,9 @@ export type AppAction =
   | { type: "NAVIGATE"; menu: Menu }
   | { type: "PICK_SOURCE"; source: "course" | "book" }
   | { type: "BACK_TO_TYPE" }
+  | { type: "BOOK_SEARCH_START" }
+  | { type: "BOOK_SEARCH_END" }
+  | { type: "BOOK_SELECTED"; curriculum: Curriculum; today: IsoDate }
   | { type: "PICK_SITE"; site: SiteId }
   | { type: "SET_URL"; url: string }
   | { type: "FILL_SAMPLE" }
@@ -65,6 +70,7 @@ export type AppAction =
 function createInitialBuild(): BuildState {
   return {
     stage: "type",
+    site: "inflearn",
     url: "",
     extracting: false,
     errorCode: null,
@@ -115,7 +121,7 @@ function withBuild(state: AppState, patch: Partial<BuildState>): AppState {
 function allowedStages(build: BuildState): readonly BuildStage[] {
   if (build.draft === null) {
     if (build.extracting) return [];
-    return build.stage === "url" ? ["type", "url"] : ["type"];
+    return build.stage === "url" ? ["type", "url"] : build.stage === "book" ? ["type", "book"] : ["type"];
   }
   return build.editingId === null ? ["edit", "schedule"] : ["edit", "schedule", "adjust"];
 }
@@ -133,14 +139,25 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       if (build.stage !== "type") return state;
       return action.source === "course"
         ? withBuild(state, { stage: "url", bookNotice: false })
-        : withBuild(state, { bookNotice: true });
+        : withBuild(state, { stage: "book", bookNotice: false });
 
     case "BACK_TO_TYPE":
       if (build.extracting || build.draft !== null) return state;
       return withBuild(state, { stage: "type", errorCode: null, dupPlanId: null });
 
+    case "BOOK_SEARCH_START":
+      return build.stage === "book" && !build.extracting ? withBuild(state, { extracting: true, errorCode: null, dupPlanId: null }) : state;
+    case "BOOK_SEARCH_END":
+      return withBuild(state, { extracting: false });
+    case "BOOK_SELECTED": {
+      if (build.stage !== "book") return state;
+      const dup = state.plans.find((p) => p.curriculum.courseId === action.curriculum.courseId);
+      if (dup) return withBuild(state, { extracting: false, errorCode: "ALREADY_PLANNED", dupPlanId: dup.id });
+      return withBuild(state, { extracting: false, errorCode: null, dupPlanId: null, stage: "edit", draft: { curriculum: action.curriculum, settings: createDefaultSettings(action.today), overrides: {} } });
+    }
+
     case "PICK_SITE":
-      return withBuild(state, { siteNotice: action.site === "inflearn" ? null : action.site });
+      return withBuild(state, { site: action.site, siteNotice: action.site === "inflearn" || action.site === "youtube" ? null : action.site });
 
     case "SET_URL":
       if (build.extracting) return state;

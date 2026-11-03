@@ -1,5 +1,5 @@
 /** 서버가 요청할 수 있는 호스트. hostname은 정확히 일치로만 비교한다. */
-export const ALLOWED_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com", "inf.run"];
+export const ALLOWED_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com", "inf.run", "www.youtube.com", "youtube.com", "m.youtube.com", "music.youtube.com"];
 
 const INFLEARN_HOSTS: readonly string[] = ["www.inflearn.com", "inflearn.com"];
 
@@ -37,4 +37,11 @@ export function isAllowedHost(url: URL): boolean {
 
 export function isInflearnCoursePath(url: URL): boolean {
   return INFLEARN_HOSTS.includes(url.hostname) && COURSE_PATH.test(url.pathname);
+}
+
+const YOUTUBE_HOSTS: readonly string[] = ["www.youtube.com", "youtube.com", "m.youtube.com", "music.youtube.com"];
+
+export function isYouTubePlaylistUrl(url: URL): boolean {
+  const id = url.searchParams.get("list") ?? "";
+  return YOUTUBE_HOSTS.includes(url.hostname) && url.pathname === "/playlist" && /^[A-Za-z0-9_-]+$/.test(id);
 }

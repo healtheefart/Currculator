@@ -38,7 +38,7 @@ export function UrlStep(props: UrlStepProps) {
     <div className="mx-auto flex max-w-[980px] flex-col items-center gap-5 px-5 pb-20 pt-[clamp(48px,8vw,96px)] text-center">
       {extracting ? null : <TextLink onClick={props.onBack}>학습 자료 다시 고르기</TextLink>}
       <h1 className="cc-type-hero-display m-0 text-balance" style={{ fontSize: "clamp(34px,6vw,56px)" }}>
-        강의 URL만 넣으세요.
+        강의 또는 재생목록 URL을 넣어 주세요.
       </h1>
       <p
         className="cc-type-lead-airy m-0 max-w-[600px] text-pretty text-text-secondary"
@@ -53,7 +53,7 @@ export function UrlStep(props: UrlStepProps) {
             <OptionChip
               key={s.id}
               label={s.label}
-              detail={s.id === "inflearn" ? undefined : "준비 중"}
+              detail={s.id === "inflearn" || s.id === "youtube" ? undefined : "준비 중"}
               selected={s.id === site}
               onClick={() => props.onPickSite(s.id)}
             />
@@ -67,11 +67,11 @@ export function UrlStep(props: UrlStepProps) {
         <input
           type="text"
           inputMode="url"
-          aria-label="강의 URL"
+          aria-label="강의 또는 재생목록 URL"
           value={url}
           disabled={extracting}
           onChange={(e) => props.onUrlChange(e.target.value)}
-          placeholder="https://www.inflearn.com/course/..."
+          placeholder={site === "youtube" ? "https://www.youtube.com/playlist?list=..." : "https://www.inflearn.com/course/..."}
           autoComplete="off"
           spellCheck={false}
           className="cc-type-body h-12 min-w-0 flex-[1_1_280px] rounded-full border border-solid border-hairline bg-canvas px-[22px] text-ink disabled:text-text-tertiary"
