@@ -7,7 +7,8 @@
       "name": "docs-rules",
       "status": "completed",
       "started_at": "2026-11-03T17:13:15+0900",
-      "summary": "CLAUDE.md·ADR(011 개정, 015 일반화, 016 신설)·ARCHITECTURE(fetch-page.ts, 패스트캠퍼스·메가스터디 파싱 절과 fixture 실측값)·USER_FLOW(사이트 칩, 허용 입력, 오류 문구)에 패스트캠퍼스·메가스터디·YouTube 허용 호스트와 플랫폼별 경로 규칙을 반영"
+      "summary": "CLAUDE.md·ADR(011 개정, 015 일반화, 016 신설)·ARCHITECTURE(fetch-page.ts, 패스트캠퍼스·메가스터디 파싱 절과 fixture 실측값)·USER_FLOW(사이트 칩, 허용 입력, 오류 문구)에 패스트캠퍼스·메가스터디·YouTube 허용 호스트와 플랫폼별 경로 규칙을 반영",
+      "completed_at": "2026-11-03T17:16:30+0900"
     },
     {
       "step": 1,
