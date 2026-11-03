@@ -1,0 +1,46 @@
+{
+  "project": "Currculator",
+  "phase": "1-course-platforms",
+  "steps": [
+    {
+      "step": 0,
+      "name": "docs-rules",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "baseline-tests",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "url-rules",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "page-fetch",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "fastcampus-extractor",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "megastudy-extractor",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "extract-api",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "client-support",
+      "status": "pending"
+    }
+  ]
+}
