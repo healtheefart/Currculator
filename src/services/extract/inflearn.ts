@@ -20,6 +20,14 @@ function koreanCourseUrl(url: URL): URL {
   return localized;
 }
 
+function explicitKoreanCourseUrl(url: URL): URL {
+  const localized = new URL(url.href);
+  if (!localized.pathname.startsWith("/ko/course/")) {
+    localized.pathname = `/ko${localized.pathname}`;
+  }
+  return localized;
+}
+
 // ───────────── 요청 ─────────────
 
 /** 요청해도 되는 URL인가: 허용 호스트 + (인프런 호스트면) 강의 경로. inf.run은 단축 링크 경로를 허용한다. */
@@ -69,8 +77,16 @@ export async function fetchInflearnCurriculum(
           throw new ExtractError("FETCH_FAILED", "invalid Location");
         }
         if (!isRequestable(next)) throw new ExtractError("UNSUPPORTED");
+        const redirectedToLocale = /^\/[a-z]{2}\/course\//.test(next.pathname);
         next = koreanCourseUrl(next);
-        if (visited.has(next.href)) throw new ExtractError("FETCH_FAILED", "redirect loop");
+        if (visited.has(next.href)) {
+          if (!redirectedToLocale) throw new ExtractError("FETCH_FAILED", "redirect loop");
+          const explicitKorean = explicitKoreanCourseUrl(next);
+          if (!isRequestable(explicitKorean) || visited.has(explicitKorean.href)) {
+            throw new ExtractError("FETCH_FAILED", "redirect loop");
+          }
+          next = explicitKorean;
+        }
         visited.add(next.href);
         redirects += 1;
         current = next;
