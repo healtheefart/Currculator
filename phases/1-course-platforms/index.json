@@ -15,7 +15,8 @@
       "name": "baseline-tests",
       "status": "completed",
       "started_at": "2026-11-03T17:16:31+0900",
-      "summary": "51f7352의 의도된 동작에 맞춰 테스트 6개 파일 기대값 수정: url(ALLOWED_HOSTS에 YouTube 4개), messages(현재 YouTube 포함 문구), app-reducer(초기값 site, SITES에 YouTube, PICK_SOURCE book→book 단계), SourceStep(새 카드 문구·책 준비 중 배지/안내 없음), UrlStep·page(새 제목·입력 이름·INVALID_URL 문구) — lint·typecheck·470 tests 통과"
+      "summary": "51f7352의 의도된 동작에 맞춰 테스트 6개 파일 기대값 수정: url(ALLOWED_HOSTS에 YouTube 4개), messages(현재 YouTube 포함 문구), app-reducer(초기값 site, SITES에 YouTube, PICK_SOURCE book→book 단계), SourceStep(새 카드 문구·책 준비 중 배지/안내 없음), UrlStep·page(새 제목·입력 이름·INVALID_URL 문구) — lint·typecheck·470 tests 통과",
+      "completed_at": "2026-11-03T17:18:31+0900"
     },
     {
       "step": 2,
